@@ -4,13 +4,11 @@ import lekavar.lma.drinkbeer.registries.ItemRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
 import lekavar.lma.drinkbeer.utils.ModGroup;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Food;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.SoundEvent;
@@ -26,18 +24,20 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class BeerMugItem extends BlockItem {
+    private final static double MAX_PLACE_DISTANCE = 2.0D;
+
     public BeerMugItem(Block block, int nutrition) {
-        super(block, new Item.Properties().tab(ModGroup.BEAR)
+        super(block, new Item.Properties().tab(ModGroup.BEAR).stacksTo(16)
                 .food(new Food.Builder().nutrition(nutrition).alwaysEat().build()));
     }
 
     public BeerMugItem(Block block, int nutrition, Effect effect, int duration) {
-        super(block, new Item.Properties().tab(ModGroup.BEAR)
+        super(block, new Item.Properties().tab(ModGroup.BEAR).stacksTo(16)
                 .food(new Food.Builder().nutrition(nutrition).alwaysEat().effect(() -> new EffectInstance(effect, duration), 1).build()));
     }
 
     public BeerMugItem(Block block, int nutrition, Supplier<EffectInstance> effectIn) {
-        super(block, new Item.Properties().tab(ModGroup.BEAR)
+        super(block, new Item.Properties().tab(ModGroup.BEAR).stacksTo(16)
                 .food(new Food.Builder().nutrition(nutrition).alwaysEat().effect(effectIn,1).build()));
     }
 
@@ -45,6 +45,15 @@ public class BeerMugItem extends BlockItem {
     @Override
     public SoundEvent getEatingSound() {
         return SoundEventRegistry.DRINKING_BEER.get();
+    }
+
+    @Override
+    protected boolean canPlace(BlockItemUseContext p_195944_1_, BlockState p_195944_2_) {
+        if ((p_195944_1_.getClickLocation().distanceTo(p_195944_1_.getPlayer().position()) > MAX_PLACE_DISTANCE))
+            return false;
+        else {
+            return super.canPlace(p_195944_1_, p_195944_2_);
+        }
     }
 
     @Override
@@ -63,8 +72,8 @@ public class BeerMugItem extends BlockItem {
         if (player instanceof PlayerEntity && ((PlayerEntity) player).isCreative()) {
             return itemStack;
         } else {
-            ItemStack emptyMugItemStack = new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get(), 1);
-            ItemHandlerHelper.giveItemToPlayer((PlayerEntity) player, emptyMugItemStack);
+            ItemStack emptyMug = new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get(), 1);
+            ItemHandlerHelper.giveItemToPlayer((PlayerEntity) player, emptyMug);
             return itemStack;
         }
     }
