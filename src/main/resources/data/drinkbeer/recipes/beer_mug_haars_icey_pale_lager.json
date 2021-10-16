@@ -1,0 +1,18 @@
+{
+  "type": "drinkbeer:brewing",
+  "ingredients": [{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:ice"
+  }],
+  "required_empty_cup": 4,
+  "brewing_time": 24000,
+  "result": {
+    "item": "drinkbeer:beer_mug_haars_icey_pale_lager",
+    "count": 4
+  }
+}

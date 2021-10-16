@@ -1,6 +1,6 @@
 package lekavar.lma.drinkbeer.blocks;
 
-import lekavar.lma.drinkbeer.blocks.entity.BeerBarrelEntity;
+import lekavar.lma.drinkbeer.tileentity.BeerBarrelTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -56,9 +56,9 @@ public class BeerBarrelBlock extends Block {
         if (!world.isClientSide()) {
             world.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundCategory.BLOCKS, 1f, 1f);
 
-            BeerBarrelEntity beerBarrelEntity = (BeerBarrelEntity) world.getBlockEntity(pos);
-            NetworkHooks.openGui((ServerPlayerEntity) player, beerBarrelEntity, (PacketBuffer packerBuffer) -> {
-                packerBuffer.writeBlockPos(beerBarrelEntity.getBlockPos());
+            BeerBarrelTileEntity beerBarrelTileEntity = (BeerBarrelTileEntity) world.getBlockEntity(pos);
+            NetworkHooks.openGui((ServerPlayerEntity) player, beerBarrelTileEntity, (PacketBuffer packerBuffer) -> {
+                packerBuffer.writeBlockPos(beerBarrelTileEntity.getBlockPos());
             });
         }
 
@@ -73,6 +73,6 @@ public class BeerBarrelBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new BeerBarrelEntity();
+        return new BeerBarrelTileEntity();
     }
 }

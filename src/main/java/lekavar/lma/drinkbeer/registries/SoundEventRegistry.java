@@ -1,4 +1,4 @@
-package lekavar.lma.drinkbeer.registry;
+package lekavar.lma.drinkbeer.registries;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -11,8 +11,7 @@ public class SoundEventRegistry {
     public static final RegistryObject<SoundEvent> DRINKING_BEER = register("drinking_beer");
     public static final RegistryObject<SoundEvent> POURING = register("pouring");
 
-    private static RegistryObject<SoundEvent> register(String name)
-    {
+    private static RegistryObject<SoundEvent> register(String name) {
         return SOUNDS.register(name, () -> new SoundEvent(new ResourceLocation("drinkbeer", name)));
     }
 }

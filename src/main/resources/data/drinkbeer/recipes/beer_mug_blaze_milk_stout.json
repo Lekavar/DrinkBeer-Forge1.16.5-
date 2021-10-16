@@ -1,0 +1,18 @@
+{
+  "type": "drinkbeer:brewing",
+  "ingredients": [{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:sugar"
+  },{
+    "item": "minecraft:blaze_powder"
+  },{
+    "item": "minecraft:water_bucket"
+  }],
+  "required_empty_cup": 4,
+  "brewing_time": 18000,
+  "result": {
+    "item": "drinkbeer:beer_mug_blaze_milk_stout",
+    "count": 4
+  }
+}

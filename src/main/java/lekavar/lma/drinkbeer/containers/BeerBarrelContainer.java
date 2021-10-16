@@ -1,36 +1,231 @@
-package lekavar.lma.drinkbeer.container;
+package lekavar.lma.drinkbeer.containers;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
-import lekavar.lma.drinkbeer.blocks.entity.BeerBarrelEntity;
-import lekavar.lma.drinkbeer.registry.BlockRegistry;
-import lekavar.lma.drinkbeer.registry.ContainerTypeRegistry;
-import lekavar.lma.drinkbeer.registry.ItemRegistry;
+import lekavar.lma.drinkbeer.registries.ContainerTypeRegistry;
+import lekavar.lma.drinkbeer.registries.ItemRegistry;
+import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
+import lekavar.lma.drinkbeer.tileentity.BeerBarrelTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class BeerBarrelContainer extends Container {
-    private final Inventory input;
+    private static final int STATUS_CODE = 1;
+    private static final int BREWING_REMAINING_TIME = 0;
+    private final IInventory brewingSpace;
+    private final IIntArray syncData;
+
+    public BeerBarrelContainer(int id, IInventory brewingSpace, IIntArray syncData, PlayerInventory playerInventory) {
+        super(ContainerTypeRegistry.beerBarrelContainer.get(), id);
+        this.brewingSpace = brewingSpace;
+        this.syncData = syncData;
+
+        // Layout Slot
+        // Plauer Inventory
+        layoutPlayerInventorySlots(8,84, new InvWrapper(playerInventory));
+        // Input Ingredients
+        addSlot(new InputSlot(brewingSpace,0,28,26,syncData));
+        addSlot(new InputSlot(brewingSpace,1,46,26,syncData));
+        addSlot(new InputSlot(brewingSpace,2,28,44,syncData));
+        addSlot(new InputSlot(brewingSpace,3,46,44,syncData));
+        // Empty Cup
+        addSlot(new CupSlot(brewingSpace,4,73,50));
+        // Output
+        addSlot(new OutputSlot(brewingSpace,5,128,34,syncData));
+
+        //Tracking Data
+        addDataSlots(syncData);
+    }
+
+    public BeerBarrelContainer(int id, PlayerInventory playerInventory, PacketBuffer data) {
+        this(id,playerInventory,data.readBlockPos());
+    }
+
+    public BeerBarrelContainer(int id, PlayerInventory playerInventory, BlockPos pos) {
+        this(id,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)),((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData,playerInventory);
+    }
+
+    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
+        for (int i = 0 ; i < amount ; i++) {
+            addSlot(new SlotItemHandler(handler, index, x, y));
+            x += dx;
+            index++;
+        }
+        return index;
+    }
+
+    private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
+        for (int j = 0 ; j < verAmount ; j++) {
+            index = addSlotRange(handler, index, x, y, horAmount, dx);
+            y += dy;
+        }
+        return index;
+    }
+
+    private void layoutPlayerInventorySlots(int leftCol, int topRow, IItemHandler playerInventory) {
+        // Player inventory
+        addSlotBox(playerInventory, 9, leftCol, topRow, 9, 18, 3, 18);
+
+        // Hotbar
+        topRow += 58;
+        addSlotRange(playerInventory, 0, leftCol, topRow, 9, 18);
+    }
+
+    @Override
+    public ItemStack quickMoveStack(PlayerEntity p_82846_1_, int p_82846_2_) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(p_82846_2_);
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
+            itemstack = itemstack1.copy();
+
+            // Try quick-pickup output
+            if (p_82846_2_ == 2) {
+                if (!this.moveItemStackTo(itemstack1, 0, 36, false)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+
+            // Try quick-move item in player inv.
+            else if (p_82846_2_ < 36) {
+                // Try to fill cup slot first.
+                if (this.isEmptyCup(itemstack1)) {
+                    if (!this.moveItemStackTo(itemstack1, 40, 41, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                // Try to fill ingredient slot.
+                if (!this.moveItemStackTo(itemstack1, 36, 40, false)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+            // Try quick-move item to player inv.
+            else if (!this.moveItemStackTo(itemstack1, 0, 36, false)) {
+                return ItemStack.EMPTY;
+            }
+
+            // Detect weather the quick-move is successful or not
+            if (itemstack1.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            // Detect weather the quick-move is successful or not
+            if (itemstack1.getCount() == itemstack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(p_82846_1_, itemstack1);
+        }
+
+        return itemstack;
+    }
+
+    public boolean isEmptyCup(ItemStack itemStack){
+        return itemStack.getItem()==ItemRegistry.EMPTY_BEER_MUG.get();
+    }
+
+    @Override
+    public boolean stillValid(PlayerEntity p_75145_1_) {
+        return this.brewingSpace.stillValid(p_75145_1_);
+    }
+
+    public boolean getIsBrewing() {
+        return syncData.get(STATUS_CODE)==1;
+    }
+
+    public int getStandardBrewingTime() {
+        return syncData.get(BREWING_REMAINING_TIME);
+    }
+
+    public int getRemainingBrewingTime() {
+        return syncData.get(BREWING_REMAINING_TIME);
+    }
+
+    @Override
+    public void removed(PlayerEntity player) {
+        if(!player.level.isClientSide()){
+            // Return Item to Player;
+            for(int i=0;i<5;i++){
+                if(!brewingSpace.getItem(i).isEmpty()){
+                    ItemHandlerHelper.giveItemToPlayer(player, brewingSpace.removeItem(i,brewingSpace.getItem(i).getCount()));
+                }
+            }
+            // Play Closing Barrel Sound
+            player.level.playSound(player, player.blockPosition(), SoundEvents.BARREL_CLOSE, SoundCategory.BLOCKS, 1f, 1f);
+            super.removed(player);
+        }
+    }
+
+    static class InputSlot extends Slot{
+        private final IIntArray syncData;
+
+        public InputSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, IIntArray syncData) {
+            super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
+            this.syncData = syncData;
+        }
+
+        // When statusCode is 1 (brewing), place is prohibited.
+        @Override
+        public boolean mayPlace(ItemStack p_75214_1_) {
+            return syncData.get(STATUS_CODE) != 1;
+        }
+
+    }
+
+    static class CupSlot extends Slot{
+        public CupSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
+            super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
+        }
+
+        // Only Empty Cup is Allowed.
+        @Override
+        public boolean mayPlace(ItemStack p_75214_1_) {
+            return p_75214_1_.getItem() == ItemRegistry.EMPTY_BEER_MUG.get();
+        }
+    }
+
+    static class OutputSlot extends Slot{
+        private final IIntArray syncData;
+
+        public OutputSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, IIntArray syncData) {
+            super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
+            this.syncData = syncData;
+        }
+
+        // After player picking up product, play pour sound effect
+        // statusCode reset is handled by TileEntity#tick
+        @Override
+        public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_) {
+            p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
+            return super.onTake(p_190901_1_, p_190901_2_);
+        }
+
+        // Placing item on output slot is prohibited.
+        @Override
+        public boolean mayPlace(ItemStack p_75214_1_) {
+            return false;
+        }
+
+        // Only statusCode is 2 (waiting for pickup), pickup is allowed.
+        @Override
+        public boolean mayPickup(PlayerEntity p_82869_1_) {
+            return syncData.get(STATUS_CODE) == 2;
+        }
+    }
+
+   /* private final Inventory input;
     private final Inventory output;
     private List<ItemStack> getBackResultList;
     private final Slot materialSlot1;
@@ -40,16 +235,16 @@ public class BeerBarrelContainer extends Container {
     private final Slot emptyMugSlot;
     private final Slot resultSlot;
     private PlayerInventory playerInv;
-    private BeerBarrelEntity entity;
+    private BeerBarrelTileEntity barrelTileEntity;
     public Boolean pouring;
 
     public BeerBarrelContainer(int id, PlayerInventory playerInventory, PacketBuffer extraData) {
-        this(id, playerInventory, (BeerBarrelEntity) Minecraft.getInstance().level.getBlockEntity(extraData.readBlockPos()));
+        this(id, playerInventory, (BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(extraData.readBlockPos()));
     }
 
-    public BeerBarrelContainer(int id, PlayerInventory playerInventory, BeerBarrelEntity e) {
+    public BeerBarrelContainer(int id, PlayerInventory playerInventory, BeerBarrelTileEntity e) {
         super(ContainerTypeRegistry.beerBarrelContainer.get(), id);
-        this.entity = e;
+        this.barrelTileEntity = e;
         this.input = new Inventory(5);
         this.output = new Inventory(1);
         this.playerInv = playerInventory;
@@ -142,7 +337,7 @@ public class BeerBarrelContainer extends Container {
         this.emptyMugSlot = this.addSlot(new Slot(input, 4, 73, 50) {
             @Override
             public boolean mayPlace(ItemStack stack) {
-                if (stack.getItem().asItem() == ItemRegistry.emptyBeerMug.get() && isMaterialCompleted() && !isBrewing())
+                if (stack.getItem().asItem() == ItemRegistry.EMPTY_BEER_MUG.get() && isMaterialCompleted() && !isBrewing())
                     return true;
                 else
                     return false;
@@ -187,9 +382,9 @@ public class BeerBarrelContainer extends Container {
         for (m = 0; m < 9; ++m) {
             this.addSlot(new Slot(playerInv, m, 8 + m * 18, 142));
         }
-        if (this.entity.get(2) != 0) {
+        if (this.barrelTileEntity.get(2) != 0) {
             BiMap<Integer, Item> beerTypeMap = createBeerTypeMap();
-            ItemStack resultItemStack = new ItemStack(beerTypeMap.get(this.entity.get(2)), 4);
+            ItemStack resultItemStack = new ItemStack(beerTypeMap.get(this.barrelTileEntity.get(2)), 4);
             this.resultSlot.set(resultItemStack);
         }
 
@@ -208,7 +403,7 @@ public class BeerBarrelContainer extends Container {
 
             @Override
             public void set(int value) {
-                entity.set(0, value);
+                barrelTileEntity.set(0, value);
             }
         });
     }
@@ -222,7 +417,7 @@ public class BeerBarrelContainer extends Container {
 
             @Override
             public void set(int value) {
-                entity.set(1, value);
+                barrelTileEntity.set(1, value);
             }
         });
     }
@@ -236,7 +431,7 @@ public class BeerBarrelContainer extends Container {
 
             @Override
             public void set(int value) {
-                entity.set(2, value);
+                barrelTileEntity.set(2, value);
             }
         });
     }
@@ -250,50 +445,47 @@ public class BeerBarrelContainer extends Container {
 
             @Override
             public void set(int value) {
-                entity.set(3, value);
+                barrelTileEntity.set(3, value);
             }
         });
     }
 
     public void resetBeerBarrel() {
-        this.entity.set(1, 0);
-        this.entity.set(2, 0);
-        this.entity.set(3, 0);
-        this.entity.setChanged();
+        this.barrelTileEntity.set(1, 0);
+        this.barrelTileEntity.set(2, 0);
+        this.barrelTileEntity.set(3, 0);
+        this.barrelTileEntity.setChanged();
     }
 
     public boolean isBrewing() {
-        return this.getIsBrewing() == 1 ? true : false;
+        return this.getIsBrewing() == 1;
     }
 
     public boolean isBrewingTimeRemain() {
-        return this.getRemainingBrewingTime() > 0 ? true : false;
+        return this.getRemainingBrewingTime() > 0;
     }
 
     public boolean isMaterialCompleted() {
-        if (getIsMaterialCompleted() == 0)
-            return false;
-        else
-            return true;
+        return getIsMaterialCompleted() != 0;
     }
 
     public int getRemainingBrewingTime() {
-        return this.entity.get(0);
+        return this.barrelTileEntity.get(0);
     }
 
     public int getIsMaterialCompleted() {
-        return this.entity.get(1);
+        return this.barrelTileEntity.get(1);
     }
 
     public int getBeerType() {
-        return this.entity.get(2);
+        return this.barrelTileEntity.get(2);
     }
 
     public int getIsBrewing() {
-        return this.entity.get(3);
+        return this.barrelTileEntity.get(3);
     }
 
-    public void stopPouring(){
+    public void stopPouring() {
         this.pouring = false;
     }
 
@@ -308,11 +500,11 @@ public class BeerBarrelContainer extends Container {
 
     @Override
     public boolean stillValid(PlayerEntity player) {
-        return stillValid(IWorldPosCallable.create(entity.getLevel(), entity.getBlockPos()), player, BlockRegistry.beerBarrel.get());
+        return stillValid(IWorldPosCallable.create(barrelTileEntity.getLevel(), barrelTileEntity.getBlockPos()), player, BlockRegistry.BEER_BARREL.get());
     }
 
-    public BeerBarrelEntity getEntity(){
-        return entity;
+    public BeerBarrelTileEntity getBarrelTileEntity() {
+        return barrelTileEntity;
     }
 
     @Override
@@ -344,7 +536,7 @@ public class BeerBarrelContainer extends Container {
         if (isBrewing())
             return;
 
-        this.entity.set(1, 0);
+        this.barrelTileEntity.set(1, 0);
         this.resultSlot.set(ItemStack.EMPTY);
 
         ItemStack materialItemStack1 = this.materialSlot1.getItem();
@@ -376,8 +568,8 @@ public class BeerBarrelContainer extends Container {
         ItemStack resultItemStack = getResult(map);
         if (!resultItemStack.isEmpty()) {
             this.resultSlot.set(resultItemStack);
-            this.entity.set(1, 1);
-            this.entity.setChanged();
+            this.barrelTileEntity.set(1, 1);
+            this.barrelTileEntity.setChanged();
         } else {
             //doNothing
         }
@@ -387,10 +579,10 @@ public class BeerBarrelContainer extends Container {
             if (emptyMugItemStack.getCount() >= 4) {
                 Item beerItem = this.resultSlot.getItem().getItem();
                 BiMap<Item, Integer> beerTypeMap = createBeerTypeMap().inverse();
-                this.entity.set(0, getBrewingTimeInResultSlot());
-                this.entity.set(2, beerTypeMap.get(beerItem));
-                this.entity.set(3, 1);
-                this.entity.setChanged();
+                this.barrelTileEntity.set(0, getBrewingTimeInResultSlot());
+                this.barrelTileEntity.set(2, beerTypeMap.get(beerItem));
+                this.barrelTileEntity.set(3, 1);
+                this.barrelTileEntity.setChanged();
 
                 this.getBackResultList = getBackResult();
 
@@ -487,25 +679,25 @@ public class BeerBarrelContainer extends Container {
 
     public static Map<Item, Integer> createBrewingTimeMap() {
         Map<Item, Integer> map = Maps.newLinkedHashMap();
-        map.put(ItemRegistry.beerMug.get(), 24000);
-        map.put(ItemRegistry.beerMugBlazeStout.get(), 12000);
-        map.put(ItemRegistry.beerMugBlazeMilkStout.get(), 18000);
-        map.put(ItemRegistry.beerMugAppleLambic.get(), 24000);
-        map.put(ItemRegistry.beerMugSweetBerryKriek.get(), 24000);
-        map.put(ItemRegistry.beerMugHaarsIceyPaleLager.get(), 24000);
-        map.put(ItemRegistry.beerMugPumpkinKvass.get(), 12000);
+        map.put(ItemRegistry.BEER_MUG.get(), 24000);
+        map.put(ItemRegistry.BEER_MUG_BLAZE_STOUT.get(), 12000);
+        map.put(ItemRegistry.BEER_MUG_BLAZE_MILK_STOUT.get(), 18000);
+        map.put(ItemRegistry.BEER_MUG_APPLE_LAMBIC.get(), 24000);
+        map.put(ItemRegistry.BEER_MUG_SWEET_BERRY_KRIEK.get(), 24000);
+        map.put(ItemRegistry.BEER_MUG_HAARS_ICEY_PALE_LAGER.get(), 24000);
+        map.put(ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get(), 12000);
         return map;
     }
 
     public static BiMap<Integer, Item> createBeerTypeMap() {
         BiMap<Integer, Item> map = HashBiMap.create();
-        map.put(1, ItemRegistry.beerMug.get());
-        map.put(2, ItemRegistry.beerMugBlazeStout.get().asItem());
-        map.put(3, ItemRegistry.beerMugBlazeMilkStout.get().asItem());
-        map.put(4, ItemRegistry.beerMugAppleLambic.get().asItem());
-        map.put(5, ItemRegistry.beerMugSweetBerryKriek.get());
-        map.put(6, ItemRegistry.beerMugHaarsIceyPaleLager.get());
-        map.put(7, ItemRegistry.beerMugPumpkinKvass.get());
+        map.put(1, ItemRegistry.BEER_MUG.get());
+        map.put(2, ItemRegistry.BEER_MUG_BLAZE_STOUT.get().asItem());
+        map.put(3, ItemRegistry.BEER_MUG_BLAZE_MILK_STOUT.get().asItem());
+        map.put(4, ItemRegistry.BEER_MUG_APPLE_LAMBIC.get().asItem());
+        map.put(5, ItemRegistry.BEER_MUG_SWEET_BERRY_KRIEK.get());
+        map.put(6, ItemRegistry.BEER_MUG_HAARS_ICEY_PALE_LAGER.get());
+        map.put(7, ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get());
         return map;
     }
 
@@ -515,30 +707,30 @@ public class BeerBarrelContainer extends Container {
             if (map.get(Items.WATER_BUCKET) == 1) {
                 if (map.containsKey(Items.WHEAT)) {
                     if (map.get(Items.WHEAT) == 3) {
-                        return new ItemStack(ItemRegistry.beerMug.get(), 4);
+                        return new ItemStack(ItemRegistry.BEER_MUG.get(), 4);
                     } else if (map.get(Items.WHEAT) == 2) {
                         if (map.containsKey(Items.BLAZE_POWDER))
-                            return new ItemStack(ItemRegistry.beerMugBlazeStout.get(), 4);
+                            return new ItemStack(ItemRegistry.BEER_MUG_BLAZE_STOUT.get(), 4);
                         if (map.containsKey(Items.APPLE))
-                            return new ItemStack(ItemRegistry.beerMugAppleLambic.get(), 4);
+                            return new ItemStack(ItemRegistry.BEER_MUG_APPLE_LAMBIC.get(), 4);
                         if (map.containsKey(Items.SWEET_BERRIES))
-                            return new ItemStack(ItemRegistry.beerMugSweetBerryKriek.get(), 4);
+                            return new ItemStack(ItemRegistry.BEER_MUG_SWEET_BERRY_KRIEK.get(), 4);
                     } else if (map.get(Items.WHEAT) == 1) {
                         if (map.containsKey(Items.BLAZE_POWDER) && map.containsKey(Items.SUGAR)) {
-                            return new ItemStack(ItemRegistry.beerMugBlazeMilkStout.get(), 4);
+                            return new ItemStack(ItemRegistry.BEER_MUG_BLAZE_MILK_STOUT.get(), 4);
                         }
                     }
                 } else if (map.containsKey(Items.BREAD)) {
                     if (map.get(Items.BREAD) == 2) {
                         if (map.containsKey(Items.PUMPKIN))
-                            return new ItemStack(ItemRegistry.beerMugPumpkinKvass.get(), 4);
+                            return new ItemStack(ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get(), 4);
                     }
                 }
             }
         } else if (map.containsKey(Items.WHEAT)) {
             if (map.get(Items.WHEAT) == 3) {
                 if (map.containsKey(Items.BLUE_ICE))
-                    return new ItemStack(ItemRegistry.beerMugHaarsIceyPaleLager.get(), 4);
+                    return new ItemStack(ItemRegistry.BEER_MUG_HAARS_ICEY_PALE_LAGER.get(), 4);
             }
         }
         //adding new recipes ends here
@@ -559,5 +751,5 @@ public class BeerBarrelContainer extends Container {
         }
         player.level.playSound(player, player.blockPosition(), SoundEvents.BARREL_CLOSE, SoundCategory.BLOCKS, 1f, 1f);
         super.removed(player);
-    }
+    }*/
 }

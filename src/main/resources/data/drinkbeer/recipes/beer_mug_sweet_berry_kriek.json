@@ -1,0 +1,18 @@
+{
+  "type": "drinkbeer:brewing",
+  "ingredients": [{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:wheat"
+  },{
+    "item": "minecraft:sweet_berries"
+  },{
+    "item": "minecraft:water_bucket"
+  }],
+  "required_empty_cup": 4,
+  "brewing_time": 24000,
+  "result": {
+    "item": "drinkbeer:beer_mug_sweet_berry_kriek",
+    "count": 4
+  }
+}

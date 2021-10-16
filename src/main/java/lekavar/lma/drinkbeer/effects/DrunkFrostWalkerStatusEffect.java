@@ -1,6 +1,6 @@
-package lekavar.lma.drinkbeer.statuseffects;
+package lekavar.lma.drinkbeer.effects;
 
-import lekavar.lma.drinkbeer.registry.StatusEffectRegistry;
+import lekavar.lma.drinkbeer.registries.EffectRegistry;
 import net.minecraft.enchantment.FrostWalkerEnchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
@@ -18,7 +18,7 @@ public class DrunkFrostWalkerStatusEffect extends Effect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int p_76394_2_) {
-        int remainingTime = entity.getEffect(StatusEffectRegistry.DRUNK_FROST_WALKER.get()).getDuration();
+        int remainingTime = entity.getEffect(EffectRegistry.DRUNK_FROST_WALKER.get()).getDuration();
         entity.addEffect(new EffectInstance(Effects.CONFUSION, remainingTime));
         FrostWalkerEnchantment.onEntityMoved(entity, entity.level, new BlockPos(entity.position()), 1);
     }

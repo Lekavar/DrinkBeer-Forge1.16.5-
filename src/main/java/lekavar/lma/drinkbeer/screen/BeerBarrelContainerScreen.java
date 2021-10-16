@@ -1,17 +1,12 @@
 package lekavar.lma.drinkbeer.screen;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import lekavar.lma.drinkbeer.container.BeerBarrelContainer;
-import lekavar.lma.drinkbeer.registry.SoundEventRegistry;
-import net.minecraft.client.gui.screen.Screen;
+import lekavar.lma.drinkbeer.containers.BeerBarrelContainer;
+import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 
 import java.awt.*;
@@ -51,14 +46,16 @@ public class BeerBarrelContainerScreen extends ContainerScreen<BeerBarrelContain
     protected void renderLabels(MatrixStack stack, int x, int y) {
         drawCenteredString(stack, this.font, this.title, (int) this.textureWidth / 2, (int) this.titleLabelY, 4210752);
         this.font.draw(stack, this.inventory.getDisplayName(), (float) this.inventoryLabelX, (float) this.inventoryLabelY, 4210752);
-        String str = menu.getIsBrewing() == 1 ? convertTickToTime(menu.getRemainingBrewingTime()) : convertTickToTime(menu.getBrewingTimeInResultSlot());
+        String str = menu.getIsBrewing() ? convertTickToTime(menu.getRemainingBrewingTime()) : convertTickToTime(menu.getStandardBrewingTime());
         int i = (this.width - this.textureWidth) / 2;
         int j = (this.height - this.textureHeight) / 2;
         this.font.draw(stack, str, (float) 128, (float) 54, new Color(64, 64, 64, 255).getRGB());
-        if (menu.pouring) {
+
+        // this sound effect part has been move to BeerBarrelContainer.OutputSlot#onTake
+        /* if (menu.pouring) {
             this.inventory.player.level.playSound(this.inventory.player, this.inventory.player.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
             menu.stopPouring();
-        }
+        }*/
     }
 
     public String convertTickToTime(int tick) {
