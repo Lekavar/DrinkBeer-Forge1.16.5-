@@ -1,11 +1,9 @@
 package lekavar.lma.drinkbeer.registries;
 
 import lekavar.lma.drinkbeer.containers.BeerBarrelContainer;
-import lekavar.lma.drinkbeer.screen.BeerBarrelContainerScreen;
+import lekavar.lma.drinkbeer.gui.BeerBarrelContainerScreen;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;

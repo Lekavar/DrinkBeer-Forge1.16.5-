@@ -11,8 +11,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -136,10 +138,6 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         }
     }
 
-    private int getStandardBrewingTime(BrewingRecipe recipe){
-        return recipe.getBrewingTime();
-    }
-
     private boolean hasEnoughEmptyCap(BrewingRecipe recipe){
         return items.get(4).getCount() >= recipe.getRequiredEmptyCup();
     }
@@ -150,7 +148,9 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         items.set(5,recipe.assemble(this));
         // Consume Ingredient & Cup;
         for(int i=0;i<4;i++){
-            items.get(i).shrink(1);
+            ItemStack ingred = items.get(i);
+            if(isBucket(ingred)) items.set(i, Items.BUCKET.getDefaultInstance());
+            else ingred.shrink(1);
         }
         items.get(4).shrink(recipe.getRequiredEmptyCup());
         // Set Remaining Time;
@@ -159,6 +159,10 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         statusCode = 1;
 
         setChanged();
+    }
+
+    private boolean isBucket(ItemStack itemStack) {
+        return itemStack.getItem() instanceof BucketItem;
     }
 
     private void clearPreview(){

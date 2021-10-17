@@ -1,12 +1,10 @@
-package lekavar.lma.drinkbeer.screen;
+package lekavar.lma.drinkbeer.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import lekavar.lma.drinkbeer.containers.BeerBarrelContainer;
-import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
 
 import java.awt.*;
