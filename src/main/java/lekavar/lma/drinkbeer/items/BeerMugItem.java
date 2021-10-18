@@ -59,11 +59,15 @@ public class BeerMugItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         String name = this.asItem().toString();
-        if (this.asItem() != ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get()) {
+        if (hasEffectNoticeTooltip(stack.getItem())) {
             tooltip.add(new TranslationTextComponent("item.drinkbeer." + name + ".tooltip").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)));
         }
-        String hunger = String.valueOf(asItem().getFoodProperties().getNutrition());
+        String hunger = String.valueOf(stack.getItem().getFoodProperties().getNutrition());
         tooltip.add(new TranslationTextComponent("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)).append(hunger));
+    }
+
+    private boolean hasEffectNoticeTooltip(Item item){
+        return item != ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get() && item != ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get();
     }
 
     @Override

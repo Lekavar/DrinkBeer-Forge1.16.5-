@@ -25,7 +25,7 @@ public class BeerBarrelContainer extends Container {
     private final IInventory brewingSpace;
     private final IIntArray syncData;
 
-    public BeerBarrelContainer(int id, IInventory brewingSpace, IIntArray syncData, PlayerInventory playerInventory) {
+    public BeerBarrelContainer(int id, IInventory brewingSpace, IIntArray syncData, PlayerInventory playerInventory, BeerBarrelTileEntity beerBarrelTileEntity) {
         super(ContainerTypeRegistry.beerBarrelContainer.get(), id);
         this.brewingSpace = brewingSpace;
         this.syncData = syncData;
@@ -41,7 +41,7 @@ public class BeerBarrelContainer extends Container {
         // Empty Cup
         addSlot(new CupSlot(brewingSpace,4,73,50));
         // Output
-        addSlot(new OutputSlot(brewingSpace,5,128,34,syncData));
+        addSlot(new OutputSlot(brewingSpace,5,128,34,syncData,beerBarrelTileEntity));
 
         //Tracking Data
         addDataSlots(syncData);
@@ -52,7 +52,7 @@ public class BeerBarrelContainer extends Container {
     }
 
     public BeerBarrelContainer(int id, PlayerInventory playerInventory, BlockPos pos) {
-        this(id,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)),((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData,playerInventory);
+        this(id,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)),((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData,playerInventory,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
     }
 
     private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
@@ -183,17 +183,26 @@ public class BeerBarrelContainer extends Container {
 
     static class OutputSlot extends Slot{
         private final IIntArray syncData;
+        private final BeerBarrelTileEntity beerBarrelTileEntity;
 
-        public OutputSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, IIntArray syncData) {
+        public OutputSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, IIntArray syncData, BeerBarrelTileEntity beerBarrelTileEntity) {
             super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
             this.syncData = syncData;
+            this.beerBarrelTileEntity = beerBarrelTileEntity;
         }
 
         // After player picking up product, play pour sound effect
         // statusCode reset is handled by TileEntity#tick
         @Override
         public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_) {
-            p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
+            if(p_190901_2_.getItem() == ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get()){
+                p_190901_1_.level.playSound((PlayerEntity)null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING_CHRISTMAS_VER.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING_CHRISTMAS_VER.get(), SoundCategory.BLOCKS, 1f, 1f);
+
+            } else {
+                p_190901_1_.level.playSound((PlayerEntity)null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
+            }
             return super.onTake(p_190901_1_, p_190901_2_);
         }
 

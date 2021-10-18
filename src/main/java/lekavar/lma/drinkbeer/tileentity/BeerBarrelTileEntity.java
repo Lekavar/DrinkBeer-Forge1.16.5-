@@ -11,10 +11,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -162,7 +159,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     }
 
     private boolean isBucket(ItemStack itemStack) {
-        return itemStack.getItem() instanceof BucketItem;
+        return itemStack.getItem() instanceof BucketItem || itemStack.getItem() instanceof MilkBucketItem;
     }
 
     private void clearPreview(){
@@ -212,7 +209,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     @Nullable
     @Override
     public Container createMenu(int id, PlayerInventory inventory, PlayerEntity player) {
-        return new BeerBarrelContainer(id, this, syncData, inventory);
+        return new BeerBarrelContainer(id, this, syncData, inventory,this);
     }
 
     @Override
