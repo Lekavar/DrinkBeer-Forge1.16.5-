@@ -2,6 +2,7 @@ package lekavar.lma.drinkbeer.registries;
 
 import lekavar.lma.drinkbeer.blocks.BeerBarrelBlock;
 import lekavar.lma.drinkbeer.blocks.BeerMugBlock;
+import lekavar.lma.drinkbeer.blocks.CallBellBlock;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -13,6 +14,8 @@ public class BlockRegistry {
     //general
     public static final RegistryObject<Block> BEER_BARREL = BLOCKS.register("beer_barrel", BeerBarrelBlock::new);
     public static final RegistryObject<Block> EMPTY_BEER_MUG = BLOCKS.register("empty_beer_mug", BeerMugBlock::new);
+    public static final RegistryObject<Block> IRON_CALL_BELL = BLOCKS.register("iron_call_bell", CallBellBlock::new);
+    public static final RegistryObject<Block> GOLDEN_CALL_BELL = BLOCKS.register("golden_call_bell", CallBellBlock::new);
 
     //beer
     public static final RegistryObject<Block> BEER_MUG = BLOCKS.register("beer_mug", BeerMugBlock::new);

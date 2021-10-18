@@ -134,7 +134,6 @@ public class BeerMugBlock extends Block {
         return PushReaction.DESTROY;
     }
 
-    // canPlaceAt
     @Override
     public boolean canSurvive(BlockState p_196260_1_, IWorldReader p_196260_2_, BlockPos p_196260_3_) {
         if(p_196260_2_.getBlockState(p_196260_3_.below()).getBlock() instanceof BeerMugBlock) return false;
