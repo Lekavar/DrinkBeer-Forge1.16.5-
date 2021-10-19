@@ -33,7 +33,7 @@ public class BeerBarrelBlock extends Block {
     protected static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 15, 15);
 
     public BeerBarrelBlock() {
-        super(Properties.of(Material.WOOD).strength(2.0f));
+        super(Properties.of(Material.WOOD).strength(2.0f).noOcclusion());
     }
 
     @Override

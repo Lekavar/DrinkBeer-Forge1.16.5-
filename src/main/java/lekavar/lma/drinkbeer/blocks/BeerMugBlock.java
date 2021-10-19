@@ -1,6 +1,5 @@
 package lekavar.lma.drinkbeer.blocks;
 
-import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -9,7 +8,6 @@ import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
@@ -23,11 +21,9 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import javax.swing.plaf.basic.BasicComboBoxUI;
 
 public class BeerMugBlock extends Block {
     public static final IntegerProperty AMOUNT = IntegerProperty.create("amount", 1, 3);
@@ -40,7 +36,7 @@ public class BeerMugBlock extends Block {
             Block.box(1, 0, 1, 15, 6, 15)};
 
     public BeerMugBlock() {
-        super(Properties.of(Material.WOOD).strength(1.0f));
+        super(Properties.of(Material.WOOD).strength(1.0f).noOcclusion());
     }
 
     @Override
