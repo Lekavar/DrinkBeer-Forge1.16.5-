@@ -128,7 +128,7 @@ public class BrewingRecipe implements IRecipe<IBrewingInventory> {
         private static NonNullList<Ingredient> itemsFromJson(JsonArray jsonArray) {
             NonNullList<Ingredient> ingredients = NonNullList.create();
             for (int i = 0; i < jsonArray.size(); ++i) {
-                Ingredient ingredient = Ingredient.fromJson(jsonArray.get(i).getAsJsonObject());
+                Ingredient ingredient = Ingredient.fromJson(jsonArray.get(i));
                 ingredients.add(ingredient);
             }
             return ingredients;

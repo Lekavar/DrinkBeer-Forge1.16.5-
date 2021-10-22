@@ -1,14 +1,24 @@
 {
   "type": "drinkbeer:brewing",
-  "ingredients": [{
-    "item": "minecraft:wheat"
-  },{
-    "item": "minecraft:sugar"
-  },{
-    "item": "minecraft:blaze_powder"
-  },{
-    "item": "minecraft:water_bucket"
-  }],
+  "ingredients": [
+    [
+      {
+        "item": "minecraft:wheat"
+      },
+      {
+        "tag": "forge:crops/wheat"
+      }
+    ],
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:blaze_powder"
+    },
+    {
+      "item": "minecraft:water_bucket"
+    }
+  ],
   "cup": {
     "item": "drinkbeer:empty_beer_mug",
     "count": 4
