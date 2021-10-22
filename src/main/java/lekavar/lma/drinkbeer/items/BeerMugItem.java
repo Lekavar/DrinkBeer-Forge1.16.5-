@@ -67,7 +67,7 @@ public class BeerMugItem extends BlockItem {
     }
 
     private boolean hasEffectNoticeTooltip(Item item){
-        return item != ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get() && item != ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get();
+        return item != ItemRegistry.BEER_MUG_PUMPKIN_KVASS.get() /*&& item != ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get()*/;
     }
 
     @Override
