@@ -1,13 +1,13 @@
 package lekavar.lma.drinkbeer.tileentity;
 
-import lekavar.lma.drinkbeer.containers.BeerBarrelContainer;
+import lekavar.lma.drinkbeer.gui.BeerBarrelContainer;
 import lekavar.lma.drinkbeer.recipes.BrewingRecipe;
+import lekavar.lma.drinkbeer.recipes.IBrewingInventory;
 import lekavar.lma.drinkbeer.registries.RecipeRegistry;
 import lekavar.lma.drinkbeer.registries.TileEntityRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
@@ -25,9 +25,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
+public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IBrewingInventory {
     private NonNullList<ItemStack> items = NonNullList.withSize(6, ItemStack.EMPTY);
     // This int will not only indicate remainingBrewTime, but also represent Standard Brewing Time if valid in "waiting for ingredients" stage
     private int remainingBrewTime;
@@ -74,7 +73,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
             // waiting for ingredient
             if(statusCode == 0){
                 // ingredient slots must have no empty slot
-                if(!getIngredientItems().contains(ItemStack.EMPTY)){
+                if(!getIngredients().contains(ItemStack.EMPTY)){
                     // Try match Recipe
                     BrewingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeRegistry.Type.BREWING,this,this.level).orElse(null);
                     if(canBrew(recipe)){
@@ -98,7 +97,6 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
             else if(statusCode == 1){
                 if(remainingBrewTime>0) {
                     remainingBrewTime--;
-                    setChanged();
                 }
                 // Enter "waiting for pickup"
                 else{
@@ -106,8 +104,8 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
                     remainingBrewTime = 0;
                     // Enter Next Stage
                     statusCode = 2;
-                    setChanged();
                 }
+                setChanged();
             }
             // waiting for pickup
             else if(statusCode == 2){
@@ -136,7 +134,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     }
 
     private boolean hasEnoughEmptyCap(BrewingRecipe recipe){
-        return items.get(4).getCount() >= recipe.getRequiredEmptyCup();
+        return recipe.isCupQualified(this);
     }
 
     private void startBrewing(BrewingRecipe recipe){
@@ -149,7 +147,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
             if(isBucket(ingred)) items.set(i, Items.BUCKET.getDefaultInstance());
             else ingred.shrink(1);
         }
-        items.get(4).shrink(recipe.getRequiredEmptyCup());
+        items.get(4).shrink(recipe.getRequiredCupCount());
         // Set Remaining Time;
         remainingBrewTime = recipe.getBrewingTime();
         // Change Status Code to 1 (brewing)
@@ -174,13 +172,21 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         setChanged();
     }
 
-    // Get All Items in Ingredient Slots and set the number of them to 1
-    public List<ItemStack> getIngredientItems(){
+
+    @Nonnull
+    @Override
+    public List<ItemStack> getIngredients(){
         NonNullList<ItemStack> sample = NonNullList.withSize(4,ItemStack.EMPTY);
         for(int i=0;i<4;i++){
-            sample.set(i,items.get(i));
+            sample.set(i,items.get(i).copy());
         }
         return sample;
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack getCup() {
+        return items.get(4).copy();
     }
 
     @Override
@@ -276,7 +282,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Override
     public int getMaxStackSize() {
-        return IInventory.super.getMaxStackSize();
+        return IBrewingInventory.super.getMaxStackSize();
     }
 
     @Override

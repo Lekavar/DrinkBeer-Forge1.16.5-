@@ -1,6 +1,6 @@
 package lekavar.lma.drinkbeer.registries;
 
-import lekavar.lma.drinkbeer.containers.BeerBarrelContainer;
+import lekavar.lma.drinkbeer.gui.BeerBarrelContainer;
 import lekavar.lma.drinkbeer.gui.BeerBarrelContainerScreen;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.ContainerType;

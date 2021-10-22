@@ -48,7 +48,7 @@ public class CallBellBlock extends Block {
                 world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLE.get(), SoundCategory.BLOCKS, 1.2f, 1f);
             }
         }
-        return ActionResultType.SUCCESS;
+        return ActionResultType.sidedSuccess(world.isClientSide);
     }
 
     @Override

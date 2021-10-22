@@ -9,7 +9,10 @@
   },{
     "item": "minecraft:ice"
   }],
-  "required_empty_cup": 4,
+  "cup": {
+    "item": "drinkbeer:empty_beer_mug",
+    "count": 4
+  },
   "brewing_time": 24000,
   "result": {
     "item": "drinkbeer:beer_mug_haars_icey_pale_lager",

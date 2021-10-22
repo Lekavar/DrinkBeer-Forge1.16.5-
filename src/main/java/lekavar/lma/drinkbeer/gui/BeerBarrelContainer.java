@@ -1,4 +1,4 @@
-package lekavar.lma.drinkbeer.containers;
+package lekavar.lma.drinkbeer.gui;
 
 import lekavar.lma.drinkbeer.registries.ContainerTypeRegistry;
 import lekavar.lma.drinkbeer.registries.ItemRegistry;

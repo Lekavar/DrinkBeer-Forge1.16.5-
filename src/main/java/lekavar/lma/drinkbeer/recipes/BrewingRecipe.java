@@ -1,14 +1,14 @@
 package lekavar.lma.drinkbeer.recipes;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lekavar.lma.drinkbeer.registries.RecipeRegistry;
-import lekavar.lma.drinkbeer.tileentity.BeerBarrelTileEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
@@ -19,44 +19,48 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 //TODO 先重写完酒桶
-public class BrewingRecipe implements IRecipe<BeerBarrelTileEntity> {
+public class BrewingRecipe implements IRecipe<IBrewingInventory> {
     private final ResourceLocation id;
-    private final NonNullList<ItemStack> input;
-    private final int requiredEmptyCup;
+    private final NonNullList<Ingredient> input;
+    private final ItemStack cup;
     private final int brewingTime;
     private final ItemStack result;
 
-    public BrewingRecipe(ResourceLocation id, NonNullList<ItemStack> input, int requiredEmptyCup, int brewingTime, ItemStack result) {
+    public BrewingRecipe(ResourceLocation id, NonNullList<Ingredient> input, ItemStack cup, int brewingTime, ItemStack result) {
         this.id = id;
         this.input = input;
-        this.requiredEmptyCup = requiredEmptyCup;
+        this.cup = cup;
         this.brewingTime = brewingTime;
         this.result = result;
     }
 
     @Override
-    public boolean matches(BeerBarrelTileEntity p_77569_1_, World p_77569_2_) {
-        List<Item> testTarget = input.stream().map(ItemStack::copy).map(ItemStack::getItem).collect(Collectors.toList());
-        List<ItemStack> beCompared = p_77569_1_.getIngredientItems();
-        for (ItemStack itemStack : beCompared) {
-            if (testTarget.contains(itemStack.getItem())) {
-                testTarget.remove(itemStack.getItem());
-            } else {
-                return false;
-            }
+    public boolean matches(IBrewingInventory p_77569_1_, World p_77569_2_) {
+        List<Ingredient> testTarget = Lists.newArrayList(input);
+        List<ItemStack> tested = p_77569_1_.getIngredients();
+        for (ItemStack itemStack : tested) {
+            int i = getLatestMatched(testTarget, itemStack);
+            if (i == -1) return false;
+            else testTarget.remove(i);
         }
         return testTarget.isEmpty();
+    }
+
+    private int getLatestMatched(List<Ingredient> testTarget, ItemStack tested) {
+        for (int i = 0; i < testTarget.size(); i++) {
+            if (testTarget.get(i).test(tested)) return i;
+        }
+        return -1;
     }
 
     /**
      * Returns an Item that is the result of this recipe
      */
     @Override
-    public ItemStack assemble(BeerBarrelTileEntity p_77572_1_) {
+    public ItemStack assemble(IBrewingInventory inventory) {
         return result.copy();
     }
 
@@ -98,8 +102,12 @@ public class BrewingRecipe implements IRecipe<BeerBarrelTileEntity> {
         return RecipeRegistry.Type.BREWING;
     }
 
-    public int getRequiredEmptyCup() {
-        return requiredEmptyCup;
+    public int getRequiredCupCount() {
+        return cup.getCount();
+    }
+
+    public boolean isCupQualified(IBrewingInventory inventory) {
+        return inventory.getCup().getItem() == cup.getItem() && inventory.getCup().getCount() >= cup.getCount();
     }
 
     public int getBrewingTime() {
@@ -109,18 +117,18 @@ public class BrewingRecipe implements IRecipe<BeerBarrelTileEntity> {
     public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<BrewingRecipe> {
 
         @Override
-        public BrewingRecipe fromJson(ResourceLocation p_199425_1_, JsonObject p_199425_2_) {
-            NonNullList<ItemStack> ingredients = itemsFromJson(JSONUtils.getAsJsonArray(p_199425_2_, "ingredients"));
-            int requiredEmptyCut = JSONUtils.getAsInt(p_199425_2_, "required_empty_cup");
-            int brewing_time = JSONUtils.getAsInt(p_199425_2_, "brewing_time");
-            ItemStack result = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(p_199425_2_, "result"), true);
-            return new BrewingRecipe(p_199425_1_, ingredients, requiredEmptyCut, brewing_time, result);
+        public BrewingRecipe fromJson(ResourceLocation resourceLocation, JsonObject jsonObject) {
+            NonNullList<Ingredient> ingredients = itemsFromJson(JSONUtils.getAsJsonArray(jsonObject, "ingredients"));
+            ItemStack cup = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(jsonObject, "cup"), true);
+            int brewing_time = JSONUtils.getAsInt(jsonObject, "brewing_time");
+            ItemStack result = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(jsonObject, "result"), true);
+            return new BrewingRecipe(resourceLocation, ingredients, cup, brewing_time, result);
         }
 
-        private static NonNullList<ItemStack> itemsFromJson(JsonArray p_199568_0_) {
-            NonNullList<ItemStack> ingredients = NonNullList.create();
-            for (int i = 0; i < p_199568_0_.size(); ++i) {
-                ItemStack ingredient = CraftingHelper.getItemStack(p_199568_0_.get(i).getAsJsonObject(), false);
+        private static NonNullList<Ingredient> itemsFromJson(JsonArray jsonArray) {
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            for (int i = 0; i < jsonArray.size(); ++i) {
+                Ingredient ingredient = Ingredient.fromJson(jsonArray.get(i).getAsJsonObject());
                 ingredients.add(ingredient);
             }
             return ingredients;
@@ -128,27 +136,27 @@ public class BrewingRecipe implements IRecipe<BeerBarrelTileEntity> {
 
         @Nullable
         @Override
-        public BrewingRecipe fromNetwork(ResourceLocation p_199426_1_, PacketBuffer p_199426_2_) {
-            int i = p_199426_2_.readVarInt();
-            NonNullList<ItemStack> ingredients = NonNullList.withSize(i, ItemStack.EMPTY);
+        public BrewingRecipe fromNetwork(ResourceLocation resourceLocation, PacketBuffer packetBuffer) {
+            int i = packetBuffer.readVarInt();
+            NonNullList<Ingredient> ingredients = NonNullList.withSize(i, Ingredient.EMPTY);
             for (int j = 0; j < ingredients.size(); ++j) {
-                ingredients.set(j, p_199426_2_.readItem());
+                ingredients.set(j, Ingredient.fromNetwork(packetBuffer));
             }
-            int requiredEmptyCup = p_199426_2_.readVarInt();
-            int brewingTime = p_199426_2_.readVarInt();
-            ItemStack result = p_199426_2_.readItem();
-            return new BrewingRecipe(p_199426_1_, ingredients, requiredEmptyCup, brewingTime, result);
+            ItemStack cup = packetBuffer.readItem();
+            int brewingTime = packetBuffer.readVarInt();
+            ItemStack result = packetBuffer.readItem();
+            return new BrewingRecipe(resourceLocation, ingredients, cup, brewingTime, result);
         }
 
         @Override
-        public void toNetwork(PacketBuffer p_199427_1_, BrewingRecipe p_199427_2_) {
-            p_199427_1_.writeVarInt(p_199427_2_.input.size());
-            for (ItemStack ingredient : p_199427_2_.input) {
-                p_199427_1_.writeItem(ingredient);
+        public void toNetwork(PacketBuffer packetBuffer, BrewingRecipe brewingRecipe) {
+            packetBuffer.writeVarInt(brewingRecipe.input.size());
+            for (Ingredient ingredient : brewingRecipe.input) {
+                ingredient.toNetwork(packetBuffer);
             }
-            p_199427_1_.writeVarInt(p_199427_2_.requiredEmptyCup);
-            p_199427_1_.writeVarInt(p_199427_2_.brewingTime);
-            p_199427_1_.writeItem(p_199427_2_.result);
+            packetBuffer.writeItem(brewingRecipe.cup);
+            packetBuffer.writeVarInt(brewingRecipe.brewingTime);
+            packetBuffer.writeItem(brewingRecipe.result);
 
         }
     }

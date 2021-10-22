@@ -54,7 +54,7 @@ public class BeerBarrelBlock extends Block {
 
     @Override
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if (!world.isClientSide()) {
+        if (!world.isClientSide) {
             world.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundCategory.BLOCKS, 1f, 1f);
 
             BeerBarrelTileEntity beerBarrelTileEntity = (BeerBarrelTileEntity) world.getBlockEntity(pos);
@@ -62,8 +62,7 @@ public class BeerBarrelBlock extends Block {
                 packerBuffer.writeBlockPos(beerBarrelTileEntity.getBlockPos());
             });
         }
-
-        return ActionResultType.SUCCESS;
+        return ActionResultType.sidedSuccess(world.isClientSide);
     }
 
 

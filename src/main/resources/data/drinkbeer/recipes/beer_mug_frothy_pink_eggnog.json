@@ -9,7 +9,10 @@
   },{
     "item": "minecraft:milk_bucket"
   }],
-  "required_empty_cup": 4,
+  "cup": {
+    "item": "drinkbeer:empty_beer_mug",
+    "count": 4
+  },
   "brewing_time": 12000,
   "result": {
     "item": "drinkbeer:beer_mug_frothy_pink_eggnog",
