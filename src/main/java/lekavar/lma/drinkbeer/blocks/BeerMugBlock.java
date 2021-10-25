@@ -33,10 +33,12 @@ public class BeerMugBlock extends Block {
             Block.box(0, 0, 0, 16, 16, 16),
             Block.box(4, 0, 4, 12, 6, 12),
             Block.box(2, 0, 2, 14, 6, 14),
-            Block.box(1, 0, 1, 15, 6, 15)};
+            Block.box(1, 0, 1, 15, 6, 15)
+    };
 
     public BeerMugBlock() {
         super(Properties.of(Material.WOOD).strength(1.0f).noOcclusion());
+        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 
     @Override

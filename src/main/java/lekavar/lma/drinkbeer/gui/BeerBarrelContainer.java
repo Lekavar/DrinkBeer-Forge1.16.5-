@@ -195,14 +195,14 @@ public class BeerBarrelContainer extends Container {
         // statusCode reset is handled by TileEntity#tick
         @Override
         public ItemStack onTake(PlayerEntity p_190901_1_, ItemStack p_190901_2_) {
-            if(p_190901_2_.getItem() == ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get()){
+            /*if(p_190901_2_.getItem() == ItemRegistry.BEER_MUG_FROTHY_PINK_EGGNOG.get()){
                 p_190901_1_.level.playSound((PlayerEntity)null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING_CHRISTMAS_VER.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
                 //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING_CHRISTMAS_VER.get(), SoundCategory.BLOCKS, 1f, 1f);
 
-            } else {
+            } else {*/
                 p_190901_1_.level.playSound((PlayerEntity)null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
                 //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
-            }
+            //}
             return super.onTake(p_190901_1_, p_190901_2_);
         }
 
