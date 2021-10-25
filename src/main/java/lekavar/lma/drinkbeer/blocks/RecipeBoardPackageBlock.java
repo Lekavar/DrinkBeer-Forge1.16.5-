@@ -1,6 +1,5 @@
 package lekavar.lma.drinkbeer.blocks;
 
-import lekavar.lma.drinkbeer.registries.BlockRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,7 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -41,18 +43,17 @@ public class RecipeBoardPackageBlock extends Block {
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         if (!world.isClientSide()) {
             world.playSound(null, pos, SoundEventRegistry.UNPACKING_PACKAGE.get(), SoundCategory.BLOCKS, 0.8f, 1f);
-            getRecipeBoardDrop().forEach(itemStack -> InventoryHelper.dropItemStack(world,pos.getX(),pos.getY(),pos.getZ(),itemStack));
-            world.setBlock(pos, Blocks.AIR.defaultBlockState(),1);
+            getRecipeBoardDrop().forEach(itemStack -> InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), itemStack));
+            world.setBlock(pos, Blocks.AIR.defaultBlockState(), 1);
         }
         return ActionResultType.sidedSuccess(world.isClientSide);
     }
 
-    private List<ItemStack> getRecipeBoardDrop(){
+    private List<ItemStack> getRecipeBoardDrop() {
         return ForgeRegistries.BLOCKS.getValues().stream().filter(block -> {
-            if(block instanceof RecipeBoardBlock){
-                return ((RecipeBoardBlock)block).isAcquirableViaPackage();
-            }
-            else return false;
+            if (block instanceof RecipeBoardBlock) {
+                return ((RecipeBoardBlock) block).isAcquirableViaPackage();
+            } else return false;
         }).map(block -> block.asItem().getDefaultInstance()).collect(Collectors.toList());
     }
 

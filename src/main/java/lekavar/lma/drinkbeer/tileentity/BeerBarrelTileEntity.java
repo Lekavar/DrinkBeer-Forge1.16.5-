@@ -11,7 +11,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.*;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.MilkBucketItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -69,18 +72,18 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Override
     public void tick() {
-        if(!level.isClientSide()){
+        if (!level.isClientSide()) {
             // waiting for ingredient
-            if(statusCode == 0){
+            if (statusCode == 0) {
                 // ingredient slots must have no empty slot
-                if(!getIngredients().contains(ItemStack.EMPTY)){
+                if (!getIngredients().contains(ItemStack.EMPTY)) {
                     // Try match Recipe
-                    BrewingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeRegistry.Type.BREWING,this,this.level).orElse(null);
-                    if(canBrew(recipe)){
+                    BrewingRecipe recipe = level.getRecipeManager().getRecipeFor(RecipeRegistry.Type.BREWING, this, this.level).orElse(null);
+                    if (canBrew(recipe)) {
                         // Show Standard Brewing Time & Result
                         showPreview(recipe);
                         // Check Weather have enough cup.
-                        if(hasEnoughEmptyCap(recipe)){
+                        if (hasEnoughEmptyCap(recipe)) {
                             startBrewing(recipe);
 
                         }
@@ -94,12 +97,12 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
                 }
             }
             // brewing
-            else if(statusCode == 1){
-                if(remainingBrewTime>0) {
+            else if (statusCode == 1) {
+                if (remainingBrewTime > 0) {
                     remainingBrewTime--;
                 }
                 // Enter "waiting for pickup"
-                else{
+                else {
                     // Prevent wired glitch such as remainingTime been set to one;
                     remainingBrewTime = 0;
                     // Enter Next Stage
@@ -108,15 +111,15 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
                 setChanged();
             }
             // waiting for pickup
-            else if(statusCode == 2){
+            else if (statusCode == 2) {
                 // Reset Stage to 0 (waiting for ingredients) after pickup Item
-                if(items.get(5).isEmpty()){
+                if (items.get(5).isEmpty()) {
                     statusCode = 0;
                     setChanged();
                 }
             }
             // Error status reset
-            else{
+            else {
                 remainingBrewTime = 0;
                 statusCode = 0;
                 setChanged();
@@ -125,26 +128,26 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     }
 
 
-    private boolean canBrew(@Nullable BrewingRecipe recipe){
-        if(recipe!=null){
-            return recipe.matches(this,this.level);
-        }else{
+    private boolean canBrew(@Nullable BrewingRecipe recipe) {
+        if (recipe != null) {
+            return recipe.matches(this, this.level);
+        } else {
             return false;
         }
     }
 
-    private boolean hasEnoughEmptyCap(BrewingRecipe recipe){
+    private boolean hasEnoughEmptyCap(BrewingRecipe recipe) {
         return recipe.isCupQualified(this);
     }
 
-    private void startBrewing(BrewingRecipe recipe){
+    private void startBrewing(BrewingRecipe recipe) {
         // Pre-set bear to output Slot
         // This Step must be done first
-        items.set(5,recipe.assemble(this));
+        items.set(5, recipe.assemble(this));
         // Consume Ingredient & Cup;
-        for(int i=0;i<4;i++){
+        for (int i = 0; i < 4; i++) {
             ItemStack ingred = items.get(i);
-            if(isBucket(ingred)) items.set(i, Items.BUCKET.getDefaultInstance());
+            if (isBucket(ingred)) items.set(i, Items.BUCKET.getDefaultInstance());
             else ingred.shrink(1);
         }
         items.get(4).shrink(recipe.getRequiredCupCount());
@@ -160,14 +163,14 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         return itemStack.getItem() instanceof BucketItem || itemStack.getItem() instanceof MilkBucketItem;
     }
 
-    private void clearPreview(){
-        items.set(5,ItemStack.EMPTY);
+    private void clearPreview() {
+        items.set(5, ItemStack.EMPTY);
         remainingBrewTime = 0;
         setChanged();
     }
 
-    private void showPreview(BrewingRecipe recipe){
-        items.set(5,recipe.assemble(this));
+    private void showPreview(BrewingRecipe recipe) {
+        items.set(5, recipe.assemble(this));
         remainingBrewTime = recipe.getBrewingTime();
         setChanged();
     }
@@ -175,10 +178,10 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Nonnull
     @Override
-    public List<ItemStack> getIngredients(){
-        NonNullList<ItemStack> sample = NonNullList.withSize(4,ItemStack.EMPTY);
-        for(int i=0;i<4;i++){
-            sample.set(i,items.get(i).copy());
+    public List<ItemStack> getIngredients() {
+        NonNullList<ItemStack> sample = NonNullList.withSize(4, ItemStack.EMPTY);
+        for (int i = 0; i < 4; i++) {
+            sample.set(i, items.get(i).copy());
         }
         return sample;
     }
@@ -215,7 +218,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     @Nullable
     @Override
     public Container createMenu(int id, PlayerInventory inventory, PlayerEntity player) {
-        return new BeerBarrelContainer(id, this, syncData, inventory,this);
+        return new BeerBarrelContainer(id, this, syncData, inventory, this);
     }
 
     @Override
@@ -250,7 +253,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Override
     public boolean isEmpty() {
-        for(ItemStack itemstack : this.items) {
+        for (ItemStack itemstack : this.items) {
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -290,7 +293,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         if (this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
-            return !(p_70300_1_.distanceToSqr((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D) > 64.0D);
+            return !(p_70300_1_.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) > 64.0D);
         }
     }
 

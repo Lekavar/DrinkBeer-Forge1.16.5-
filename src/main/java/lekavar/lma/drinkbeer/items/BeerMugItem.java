@@ -47,7 +47,7 @@ public class BeerMugItem extends BlockItem {
 
     public BeerMugItem(Block block, int nutrition, Supplier<EffectInstance> effectIn, boolean hasExtraTooltip) {
         super(block, new Item.Properties().tab(ModGroup.BEAR).stacksTo(16)
-                .food(new Food.Builder().nutrition(nutrition).alwaysEat().effect(effectIn,1).build()));
+                .food(new Food.Builder().nutrition(nutrition).alwaysEat().effect(effectIn, 1).build()));
         this.hasExtraTooltip = hasExtraTooltip;
     }
 
@@ -76,7 +76,7 @@ public class BeerMugItem extends BlockItem {
         tooltip.add(new TranslationTextComponent("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)).append(hunger));
     }
 
-    private boolean hasEffectNoticeTooltip(){
+    private boolean hasEffectNoticeTooltip() {
         return this.hasExtraTooltip;
     }
 
@@ -87,7 +87,7 @@ public class BeerMugItem extends BlockItem {
         if (stack.getItem() == ItemRegistry.BEER_MUG_NIGHT_HOWL_KVASS.get()) {
             player.addEffect(new EffectInstance(Effects.NIGHT_VISION, getNightVisionTime(world.getMoonPhase())));
             if (!world.isClientSide()) {
-                world.playSound(null, player.blockPosition(),getRandomNightHowlSound(), SoundCategory.PLAYERS, 1.2f, 1f);
+                world.playSound(null, player.blockPosition(), getRandomNightHowlSound(), SoundCategory.PLAYERS, 1.2f, 1f);
             }
         }
         // Return empty mug when viable
@@ -104,7 +104,7 @@ public class BeerMugItem extends BlockItem {
         return BASE_NIGHT_VISION_TIME + (moonPhase == 0 ? Math.abs(moonPhase - 1 - 4) * 1200 : Math.abs(moonPhase - 4) * 1200);
     }
 
-    private SoundEvent getRandomNightHowlSound(){
+    private SoundEvent getRandomNightHowlSound() {
         List<SoundEvent> available = ForgeRegistries.SOUND_EVENTS.getValues().stream().filter(soundEvent -> soundEvent.getRegistryName().toString().contains("night_howl_drinking_effect")).collect(Collectors.toList());
         return available.get(new Random().nextInt(available.size()));
     }

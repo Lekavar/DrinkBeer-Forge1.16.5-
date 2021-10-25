@@ -43,11 +43,7 @@ public class BeerMugBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
-        return SHAPE_BY_AMOUNT[p_220053_1_.getValue(this.getAmountProperty())];
-    }
-
-    public IntegerProperty getAmountProperty() {
-        return this.AMOUNT;
+        return SHAPE_BY_AMOUNT[p_220053_1_.getValue(AMOUNT)];
     }
 
     @Override
@@ -71,7 +67,7 @@ public class BeerMugBlock extends Block {
         ItemStack itemStack = player.getItemInHand(hand);
         // Placing Bear
         if (itemStack.getItem().asItem() == state.getBlock().asItem()) {
-            if(world.isClientSide()){
+            if (world.isClientSide()) {
                 return ActionResultType.SUCCESS;
             } else {
                 int amount = state.getValue(AMOUNT);
@@ -100,17 +96,17 @@ public class BeerMugBlock extends Block {
             }
         }
         // Retrieve Beer
-        else if (itemStack.isEmpty()){
-            if (world.isClientSide()){
+        else if (itemStack.isEmpty()) {
+            if (world.isClientSide()) {
                 return ActionResultType.SUCCESS;
             } else {
                 ItemStack takeBackBeer = state.getBlock().asItem().getDefaultInstance();
-                ItemHandlerHelper.giveItemToPlayer(player,takeBackBeer);
+                ItemHandlerHelper.giveItemToPlayer(player, takeBackBeer);
                 int amount = state.getValue(AMOUNT);
                 switch (amount) {
                     case 3:
                     case 2:
-                        world.setBlock(pos, state.getBlock().defaultBlockState().setValue(AMOUNT, amount-1).setValue(FACING, state.getValue(FACING)), 0);
+                        world.setBlock(pos, state.getBlock().defaultBlockState().setValue(AMOUNT, amount - 1).setValue(FACING, state.getValue(FACING)), 0);
                         if (!world.isClientSide()) {
                             world.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundCategory.AMBIENT, 0.5f, 0.5f);
                         }
@@ -134,7 +130,7 @@ public class BeerMugBlock extends Block {
 
     @Override
     public boolean canSurvive(BlockState p_196260_1_, IWorldReader p_196260_2_, BlockPos p_196260_3_) {
-        if(p_196260_2_.getBlockState(p_196260_3_.below()).getBlock() instanceof BeerMugBlock) return false;
-        return Block.canSupportCenter(p_196260_2_,p_196260_3_.below(),Direction.UP);
+        if (p_196260_2_.getBlockState(p_196260_3_.below()).getBlock() instanceof BeerMugBlock) return false;
+        return Block.canSupportCenter(p_196260_2_, p_196260_3_.below(), Direction.UP);
     }
 }

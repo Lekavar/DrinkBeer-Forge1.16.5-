@@ -7,7 +7,6 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-//TODO 搞清楚这个Type到底是做啥的
 public class RecipeRegistry {
     public static class Type {
         public static final IRecipeType<BrewingRecipe> BREWING = IRecipeType.register("drinkbeer:brewing");

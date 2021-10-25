@@ -12,7 +12,9 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.*;
+import net.minecraft.util.IIntArray;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -32,31 +34,31 @@ public class BeerBarrelContainer extends Container {
 
         // Layout Slot
         // Plauer Inventory
-        layoutPlayerInventorySlots(8,84, new InvWrapper(playerInventory));
+        layoutPlayerInventorySlots(8, 84, new InvWrapper(playerInventory));
         // Input Ingredients
-        addSlot(new Slot(brewingSpace,0,28,26));
-        addSlot(new Slot(brewingSpace,1,46,26));
-        addSlot(new Slot(brewingSpace,2,28,44));
-        addSlot(new Slot(brewingSpace,3,46,44));
+        addSlot(new Slot(brewingSpace, 0, 28, 26));
+        addSlot(new Slot(brewingSpace, 1, 46, 26));
+        addSlot(new Slot(brewingSpace, 2, 28, 44));
+        addSlot(new Slot(brewingSpace, 3, 46, 44));
         // Empty Cup
-        addSlot(new CupSlot(brewingSpace,4,73,50));
+        addSlot(new CupSlot(brewingSpace, 4, 73, 50));
         // Output
-        addSlot(new OutputSlot(brewingSpace,5,128,34,syncData,beerBarrelTileEntity));
+        addSlot(new OutputSlot(brewingSpace, 5, 128, 34, syncData, beerBarrelTileEntity));
 
         //Tracking Data
         addDataSlots(syncData);
     }
 
     public BeerBarrelContainer(int id, PlayerInventory playerInventory, PacketBuffer data) {
-        this(id,playerInventory,data.readBlockPos());
+        this(id, playerInventory, data.readBlockPos());
     }
 
     public BeerBarrelContainer(int id, PlayerInventory playerInventory, BlockPos pos) {
-        this(id,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)),((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData,playerInventory,((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
+        this(id, ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)), ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData, playerInventory, ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
     }
 
     private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
-        for (int i = 0 ; i < amount ; i++) {
+        for (int i = 0; i < amount; i++) {
             addSlot(new SlotItemHandler(handler, index, x, y));
             x += dx;
             index++;
@@ -65,7 +67,7 @@ public class BeerBarrelContainer extends Container {
     }
 
     private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
-        for (int j = 0 ; j < verAmount ; j++) {
+        for (int j = 0; j < verAmount; j++) {
             index = addSlotRange(handler, index, x, y, horAmount, dx);
             y += dy;
         }
@@ -132,8 +134,8 @@ public class BeerBarrelContainer extends Container {
         return itemstack;
     }
 
-    public boolean isEmptyCup(ItemStack itemStack){
-        return itemStack.getItem()==ItemRegistry.EMPTY_BEER_MUG.get();
+    public boolean isEmptyCup(ItemStack itemStack) {
+        return itemStack.getItem() == ItemRegistry.EMPTY_BEER_MUG.get();
     }
 
     @Override
@@ -142,7 +144,7 @@ public class BeerBarrelContainer extends Container {
     }
 
     public boolean getIsBrewing() {
-        return syncData.get(STATUS_CODE)==1;
+        return syncData.get(STATUS_CODE) == 1;
     }
 
     public int getStandardBrewingTime() {
@@ -155,11 +157,11 @@ public class BeerBarrelContainer extends Container {
 
     @Override
     public void removed(PlayerEntity player) {
-        if(!player.level.isClientSide()){
+        if (!player.level.isClientSide()) {
             // Return Item to Player;
-            for(int i=0;i<5;i++){
-                if(!brewingSpace.getItem(i).isEmpty()){
-                    ItemHandlerHelper.giveItemToPlayer(player, brewingSpace.removeItem(i,brewingSpace.getItem(i).getCount()));
+            for (int i = 0; i < 5; i++) {
+                if (!brewingSpace.getItem(i).isEmpty()) {
+                    ItemHandlerHelper.giveItemToPlayer(player, brewingSpace.removeItem(i, brewingSpace.getItem(i).getCount()));
                 }
             }
         } else {
@@ -169,7 +171,7 @@ public class BeerBarrelContainer extends Container {
         super.removed(player);
     }
 
-    static class CupSlot extends Slot{
+    static class CupSlot extends Slot {
         public CupSlot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
             super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
         }
@@ -181,7 +183,7 @@ public class BeerBarrelContainer extends Container {
         }
     }
 
-    static class OutputSlot extends Slot{
+    static class OutputSlot extends Slot {
         private final IIntArray syncData;
         private final BeerBarrelTileEntity beerBarrelTileEntity;
 
@@ -200,8 +202,8 @@ public class BeerBarrelContainer extends Container {
                 //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING_CHRISTMAS_VER.get(), SoundCategory.BLOCKS, 1f, 1f);
 
             } else {*/
-                p_190901_1_.level.playSound((PlayerEntity)null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-                //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
+            p_190901_1_.level.playSound((PlayerEntity) null, beerBarrelTileEntity.getBlockPos(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+            //p_190901_1_.level.playSound(p_190901_1_, p_190901_1_.blockPosition(), SoundEventRegistry.POURING.get(), SoundCategory.BLOCKS, 1f, 1f);
             //}
             return super.onTake(p_190901_1_, p_190901_2_);
         }

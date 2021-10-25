@@ -44,7 +44,7 @@ public class CallBellBlock extends Block {
         if (!world.isClientSide()) {
             if (state.getBlock() == BlockRegistry.IRON_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.IRON_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.2f, 1f);
-            }else if(state.getBlock() == BlockRegistry.GOLDEN_CALL_BELL.get()) {
+            } else if (state.getBlock() == BlockRegistry.GOLDEN_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.2f, 1f);
             }
         }
@@ -58,7 +58,7 @@ public class CallBellBlock extends Block {
 
     @Override
     public boolean canSurvive(BlockState p_196260_1_, IWorldReader p_196260_2_, BlockPos p_196260_3_) {
-        if(p_196260_2_.getBlockState(p_196260_3_.below()).getBlock() == Blocks.AIR) return false;
-        return Block.canSupportCenter(p_196260_2_,p_196260_3_.below(), Direction.UP);
+        if (p_196260_2_.getBlockState(p_196260_3_.below()).getBlock() == Blocks.AIR) return false;
+        return Block.canSupportCenter(p_196260_2_, p_196260_3_.below(), Direction.UP);
     }
 }

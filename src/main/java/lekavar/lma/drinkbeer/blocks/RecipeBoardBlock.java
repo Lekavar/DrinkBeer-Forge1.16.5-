@@ -31,7 +31,7 @@ public class RecipeBoardBlock extends Block {
         this.acquirableViaPackage = acquirableViaPackage;
     }
 
-    public boolean isAcquirableViaPackage(){
+    public boolean isAcquirableViaPackage() {
         return this.acquirableViaPackage;
     }
 
