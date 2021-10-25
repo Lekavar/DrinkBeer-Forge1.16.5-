@@ -1,6 +1,9 @@
 package lekavar.lma.drinkbeer.utils;
 
+import lekavar.lma.drinkbeer.blocks.*;
 import lekavar.lma.drinkbeer.registries.BlockRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -34,14 +37,28 @@ public class ModGroup {
 
         @Override
         public void fillItemList(NonNullList<ItemStack> itemStackNonNullList) {
-            // TODO: waiting for fabric port deciding
+            super.fillItemList(itemStackNonNullList);
+            // Order: Beer Barrel, Empty Mug, Call Bell, Recipe Board Package, Recipe Board
             itemStackNonNullList.sort(new Comparator<ItemStack>() {
                 @Override
                 public int compare(ItemStack o1, ItemStack o2) {
-                    return 0;
+                    int i1 = getIndexNumber(o1);
+                    int i2 = getIndexNumber(o2);
+                    return i1 - i2;
                 }
             });
-            super.fillItemList(itemStackNonNullList);
+        }
+
+        private static int getIndexNumber(ItemStack itemStack){
+            if(itemStack.getItem() instanceof BlockItem){
+                Block block = ((BlockItem) itemStack.getItem()).getBlock();
+                if(block instanceof BeerBarrelBlock) return 1;
+                else if(block instanceof BeerMugBlock) return 2;
+                else if(block instanceof CallBellBlock) return 3;
+                else if(block instanceof RecipeBoardPackageBlock) return 4;
+                else if(block instanceof RecipeBoardBlock) return 5;
+            }
+            return 9999;
         }
     }
 }

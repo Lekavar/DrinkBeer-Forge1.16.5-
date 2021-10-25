@@ -43,9 +43,9 @@ public class CallBellBlock extends Block {
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         if (!world.isClientSide()) {
             if (state.getBlock() == BlockRegistry.IRON_CALL_BELL.get()) {
-                world.playSound(null, pos, SoundEventRegistry.IRON_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.2f, 1f);
+                world.playSound(null, pos, SoundEventRegistry.IRON_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.5f, 1f);
             } else if (state.getBlock() == BlockRegistry.GOLDEN_CALL_BELL.get()) {
-                world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.2f, 1f);
+                world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.8f, 1f);
             }
         }
         return ActionResultType.sidedSuccess(world.isClientSide);
