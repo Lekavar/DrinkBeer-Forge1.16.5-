@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.*;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
@@ -81,22 +82,29 @@ public class BeerMugItem extends BlockItem {
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity player) {
-        ItemStack itemStack = super.finishUsingItem(stack, world, player);
+    public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity livingEntity) {
         // Handle special drinking effect
         if (stack.getItem() == ItemRegistry.BEER_MUG_NIGHT_HOWL_KVASS.get()) {
-            player.addEffect(new EffectInstance(Effects.NIGHT_VISION, getNightVisionTime(world.getMoonPhase())));
+            livingEntity.addEffect(new EffectInstance(Effects.NIGHT_VISION, getNightVisionTime(world.getMoonPhase())));
             if (!world.isClientSide()) {
-                world.playSound(null, player.blockPosition(), getRandomNightHowlSound(), SoundCategory.PLAYERS, 1.2f, 1f);
+                world.playSound(null, livingEntity.blockPosition(), getRandomNightHowlSound(), SoundCategory.PLAYERS, 1.2f, 1f);
             }
         }
-        // Return empty mug when viable
-        if (player instanceof PlayerEntity && ((PlayerEntity) player).isCreative()) {
-            return itemStack;
+        // Return empty mug
+        if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).isCreative()) {
+            return stack;
         } else {
-            ItemStack emptyMug = new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get(), 1);
-            ItemHandlerHelper.giveItemToPlayer((PlayerEntity) player, emptyMug);
-            return itemStack;
+            if (stack.getCount() == 1) {
+                return new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get());
+            } else {
+                ItemStack emptyMug = new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get(), 1);
+                if (livingEntity instanceof PlayerEntity) {
+                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingEntity, emptyMug);
+                } else {
+                    InventoryHelper.dropItemStack(world, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), emptyMug);
+                }
+                return super.finishUsingItem(stack, world, livingEntity);
+            }
         }
     }
 
