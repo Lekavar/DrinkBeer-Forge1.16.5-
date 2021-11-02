@@ -85,16 +85,19 @@ public class BeerMugItem extends BlockItem {
     public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity livingEntity) {
         // Handle special drinking effect
         if (stack.getItem() == ItemRegistry.BEER_MUG_NIGHT_HOWL_KVASS.get()) {
-            livingEntity.addEffect(new EffectInstance(Effects.NIGHT_VISION, getNightVisionTime(world.getMoonPhase())));
+            livingEntity.addEffect(new EffectInstance(Effects.NIGHT_VISION, getNightVisionTime(moonPhase(world.dayTime()))));
             if (!world.isClientSide()) {
                 world.playSound(null, livingEntity.blockPosition(), getRandomNightHowlSound(), SoundCategory.PLAYERS, 1.2f, 1f);
             }
         }
         // Return empty mug
         if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).isCreative()) {
-            return stack;
+            ItemStack temp = stack.copy();
+            livingEntity.eat(world,stack);
+            return temp;
         } else {
             if (stack.getCount() == 1) {
+                livingEntity.eat(world,stack);
                 return new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get());
             } else {
                 ItemStack emptyMug = new ItemStack(ItemRegistry.EMPTY_BEER_MUG.get(), 1);
@@ -106,6 +109,10 @@ public class BeerMugItem extends BlockItem {
                 return super.finishUsingItem(stack, world, livingEntity);
             }
         }
+    }
+
+    public int moonPhase(long p_236035_1_) {
+        return (int)(p_236035_1_ / 24000L % 8L + 8L) % 8;
     }
 
     private int getNightVisionTime(int moonPhase) {
