@@ -92,7 +92,7 @@ public class BeerBarrelContainer extends Container {
             itemstack = itemstack1.copy();
 
             // Try quick-pickup output
-            if (p_82846_2_ == 2) {
+            if (p_82846_2_ == 41) {
                 if (!this.moveItemStackTo(itemstack1, 0, 36, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -111,6 +111,7 @@ public class BeerBarrelContainer extends Container {
                     return ItemStack.EMPTY;
                 }
             }
+
             // Try quick-move item to player inv.
             else if (!this.moveItemStackTo(itemstack1, 0, 36, false)) {
                 return ItemStack.EMPTY;
