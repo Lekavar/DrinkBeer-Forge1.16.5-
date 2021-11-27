@@ -11,15 +11,17 @@ import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
 
-public class DrunkFrostWalkerStatusEffect extends Effect {
-    public DrunkFrostWalkerStatusEffect() {
+public class DrunkFrostWalker extends Effect {
+    public DrunkFrostWalker() {
         super(EffectType.NEUTRAL, new Color(30, 144, 255, 255).getRGB());
     }
 
     @Override
     public void applyEffectTick(LivingEntity entity, int p_76394_2_) {
-        int remainingTime = entity.getEffect(EffectRegistry.DRUNK_FROST_WALKER.get()).getDuration();
-        entity.addEffect(new EffectInstance(Effects.CONFUSION, remainingTime));
+        int drunkAmplifier = Drunk.getDrunkAmplifier(entity);
+        if(!entity.level.isClientSide()){
+            entity.addEffect(new EffectInstance(EffectRegistry.DRUNK.get(), Drunk.getDrunkDuratioin(drunkAmplifier),drunkAmplifier));
+        }
         FrostWalkerEnchantment.onEntityMoved(entity, entity.level, new BlockPos(entity.position()), 1);
     }
 
