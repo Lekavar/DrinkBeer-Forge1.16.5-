@@ -6,7 +6,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectType;
-import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
@@ -19,8 +18,8 @@ public class DrunkFrostWalker extends Effect {
     @Override
     public void applyEffectTick(LivingEntity entity, int p_76394_2_) {
         int drunkAmplifier = Drunk.getDrunkAmplifier(entity);
-        if(!entity.level.isClientSide()){
-            entity.addEffect(new EffectInstance(EffectRegistry.DRUNK.get(), Drunk.getDrunkDuratioin(drunkAmplifier),drunkAmplifier));
+        if (!entity.level.isClientSide()) {
+            entity.addEffect(new EffectInstance(EffectRegistry.DRUNK.get(), Drunk.getDrunkDuratioin(drunkAmplifier), drunkAmplifier));
         }
         FrostWalkerEnchantment.onEntityMoved(entity, entity.level, new BlockPos(entity.position()), 1);
     }

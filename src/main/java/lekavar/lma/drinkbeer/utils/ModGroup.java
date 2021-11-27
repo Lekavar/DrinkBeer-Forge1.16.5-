@@ -49,14 +49,14 @@ public class ModGroup {
             });
         }
 
-        private static int getIndexNumber(ItemStack itemStack){
-            if(itemStack.getItem() instanceof BlockItem){
+        private static int getIndexNumber(ItemStack itemStack) {
+            if (itemStack.getItem() instanceof BlockItem) {
                 Block block = ((BlockItem) itemStack.getItem()).getBlock();
-                if(block instanceof BeerBarrelBlock) return 1;
-                else if(block instanceof BeerMugBlock) return 2;
-                else if(block instanceof CallBellBlock) return 3;
-                else if(block instanceof RecipeBoardPackageBlock) return 4;
-                else if(block instanceof RecipeBoardBlock) return 5;
+                if (block instanceof BeerBarrelBlock) return 1;
+                else if (block instanceof BeerMugBlock) return 2;
+                else if (block instanceof CallBellBlock) return 3;
+                else if (block instanceof RecipeBoardPackageBlock) return 4;
+                else if (block instanceof RecipeBoardBlock) return 5;
             }
             return 9999;
         }

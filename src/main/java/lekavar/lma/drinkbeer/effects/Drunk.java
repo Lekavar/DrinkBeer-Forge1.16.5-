@@ -23,7 +23,7 @@ public class Drunk extends Effect {
 
     @Override
     public void applyEffectTick(LivingEntity livingEntity, int amplifier) {
-        if(!livingEntity.level.isClientSide()){
+        if (!livingEntity.level.isClientSide()) {
             int time = livingEntity.getEffect(EffectRegistry.DRUNK.get()).getDuration();
             giveHarmfulStatusEffects(livingEntity, amplifier, time);
 
@@ -76,7 +76,7 @@ public class Drunk extends Effect {
     }
 
     public static int getDrunkDuratioin(int amplifier) {
-        if(amplifier<5){
+        if (amplifier < 5) {
             return drunkDurations[amplifier];
         } else
             return BASE_DURATION;

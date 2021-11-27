@@ -45,18 +45,18 @@ public class BrewingRecipe implements IRecipe<IBrewingInventory> {
     }
 
     @Deprecated
-    public NonNullList<Ingredient> getIngredient(){
+    public NonNullList<Ingredient> getIngredient() {
         NonNullList<Ingredient> result = NonNullList.create();
         result.addAll(input);
         return result;
     }
 
     @Deprecated
-    public ItemStack geBeerCup(){
+    public ItemStack geBeerCup() {
         return cup.copy();
     }
 
-    public ItemStack getBeerCup(){
+    public ItemStack getBeerCup() {
         return cup.copy();
     }
 
