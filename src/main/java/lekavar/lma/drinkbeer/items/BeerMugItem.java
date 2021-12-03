@@ -1,11 +1,12 @@
 package lekavar.lma.drinkbeer.items;
 
+import lekavar.lma.drinkbeer.essentials.beer.IBeer;
 import lekavar.lma.drinkbeer.registries.ItemRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
-import lekavar.lma.drinkbeer.utils.BearType;
 import lekavar.lma.drinkbeer.utils.ModGroup;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,6 +18,8 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
@@ -24,12 +27,12 @@ import java.util.List;
 
 public class BeerMugItem extends BlockItem {
     private final static double MAX_PLACE_DISTANCE = 2.0D;
-    private final BearType bearType;
+    private final IBeer beer;
 
-    public BeerMugItem(Block block, BearType bearType) {
+    public BeerMugItem(Block block, IBeer beer) {
         super(block, new Item.Properties().tab(ModGroup.BEAR).stacksTo(16)
-                .food(new Food.Builder().nutrition(bearType.nutrition).alwaysEat().build()));
-        this.bearType = bearType;
+                .food(new Food.Builder().alwaysEat().build()));
+        this.beer = beer;
     }
 
     @Override
@@ -46,21 +49,20 @@ public class BeerMugItem extends BlockItem {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        // Translation Keys are legacy design, will be changed in 1.18
         String name = this.asItem().toString();
-        if (bearType.hasExtraTooltip) {
-            tooltip.add(new TranslationTextComponent("item.drinkbeer." + name + ".tooltip").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)));
-        }
-        String hunger = String.valueOf(stack.getItem().getFoodProperties().getNutrition());
+        tooltip.add(new TranslationTextComponent("item.drinkbeer." + name + ".tooltip").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)));
+        String hunger = String.valueOf(beer.getNutrition(world, stack, Minecraft.getInstance().player));
         tooltip.add(new TranslationTextComponent("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(TextFormatting.BLUE)).append(hunger));
     }
 
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity livingEntity) {
-        if (bearType.drinkEffectHandler != null)
-            bearType.drinkEffectHandler.handle(stack, world, livingEntity);
+        beer.onDrink(world, stack, livingEntity);
         // Return empty mug
         if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).isCreative()) {
             ItemStack temp = stack.copy();

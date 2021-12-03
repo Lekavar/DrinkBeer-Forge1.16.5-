@@ -27,6 +27,7 @@ public class BlockRegistry {
     public static final RegistryObject<Block> RECIPE_BOARD_PACKAGE = BLOCKS.register("recipe_board_package", RecipeBoardPackageBlock::new);
 
     //beer
+    // Legacy Design. Will be abandoned in 1,18
     public static final RegistryObject<Block> BEER_MUG = BLOCKS.register("beer_mug", BeerMugBlock::new);
     public static final RegistryObject<Block> BEER_MUG_BLAZE_STOUT = BLOCKS.register("beer_mug_blaze_stout", BeerMugBlock::new);
     public static final RegistryObject<Block> BEER_MUG_BLAZE_MILK_STOUT = BLOCKS.register("beer_mug_blaze_milk_stout", BeerMugBlock::new);
