@@ -2,6 +2,8 @@ package lekavar.lma.drinkbeer.essentials.spice;
 
 import lekavar.lma.drinkbeer.essentials.flavor.IFlavor;
 
+import java.util.List;
+
 public interface Spice {
     /**
      * return a String as translation key;
@@ -9,5 +11,5 @@ public interface Spice {
      */
     String getTranslationKey();
 
-    IFlavor getFlavor();
+    List<IFlavor> getFlavor();
 }

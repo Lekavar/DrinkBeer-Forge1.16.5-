@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.world.World;
 
+import java.util.List;
+
 public interface IFlavor {
     /**
      * return a String as translation key;
@@ -16,17 +18,17 @@ public interface IFlavor {
         return effectInstance;
     }
 
-    default float modifyHeal(World world, ItemStack stack, LivingEntity livingEntity, float heal){
-        return heal;
+    default float modifyHealthModifier(World world, ItemStack stack, LivingEntity livingEntity, float healthModifier){
+        return healthModifier;
     }
 
     default int modifyNutrition(World world, ItemStack stack, LivingEntity livingEntity, int nutrition){
         return nutrition;
     }
 
-    default int drunkLevelModifierModify(World world, ItemStack itemStack, LivingEntity drinker, int drunkLevelModifier){
+    default int modifyDrunkLevelModifier(World world, ItemStack itemStack, LivingEntity drinker, int drunkLevelModifier){
         return drunkLevelModifier;
     }
 
-    default void onDrink(World world, ItemStack stack, LivingEntity livingEntity){}
+    default void onDrink(World world, ItemStack stack, LivingEntity drinker, List<IFlavor> baseFlavorsSet, List<IFlavor> comboFlavorsSet){}
 }
