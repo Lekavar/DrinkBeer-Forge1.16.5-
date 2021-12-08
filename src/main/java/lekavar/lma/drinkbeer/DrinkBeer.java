@@ -1,17 +1,25 @@
 package lekavar.lma.drinkbeer;
 
+import lekavar.lma.drinkbeer.essentials.beer.Beers;
+import lekavar.lma.drinkbeer.essentials.flavor.BaseFlavors;
+import lekavar.lma.drinkbeer.essentials.flavor.ComboFlavors;
 import lekavar.lma.drinkbeer.registries.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import software.bernie.geckolib3.GeckoLib;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("drinkbeer")
 public class DrinkBeer {
+
+    public static String MODID = "drinkbeer";
     // We don't need this logger now since there is no need at all.
     // Directly reference a log4j logger.
     // private static final Logger LOGGER = LogManager.getLogger();
 
     public DrinkBeer() {
+        GeckoLib.initialize();
+
         ItemRegistry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
         BlockRegistry.BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
         TileEntityRegistry.TILE_ENTITY.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -19,6 +27,10 @@ public class DrinkBeer {
         EffectRegistry.STATUS_EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ContainerTypeRegistry.CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
         RecipeRegistry.RECIPE_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        Beers.registryAll();
+        BaseFlavors.registerAll();
+        ComboFlavors.registerAll();
 
         // We just don't need these part now
         // Register the setup method for modloading

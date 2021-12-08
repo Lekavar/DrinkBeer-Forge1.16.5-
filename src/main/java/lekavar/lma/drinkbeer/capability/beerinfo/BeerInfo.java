@@ -5,7 +5,7 @@ import lekavar.lma.drinkbeer.essentials.flavor.IFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BeerInfo implements IBeerInfo{
+public class BeerInfo implements IBeerInfo {
     boolean f;
     List<IFlavor> baseFlavor;
     List<IFlavor> comboFlavor;

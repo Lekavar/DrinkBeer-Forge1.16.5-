@@ -1,6 +1,15 @@
 {
   "itemGroup.drinkbeer.beer": "啤酒",
   "itemGroup.drinkbeer.general": "喝啤酒啦通用方块",
+  "item.drinkbeer.beer_mug": "矿工麦酒",
+  "item.drinkbeer.beer_mug_blaze_stout": "烈焰黑啤",
+  "item.drinkbeer.beer_mug_blaze_milk_stout": "烈焰牛奶黑啤",
+  "item.drinkbeer.beer_mug_apple_lambic": "苹果拉比克",
+  "item.drinkbeer.beer_mug_sweet_berry_kriek": "甜浆果克里克",
+  "item.drinkbeer.beer_mug_haars_icey_pale_lager": "哈尔的冰拉格",
+  "item.drinkbeer.beer_mug_pumpkin_kvass": "南瓜格瓦斯",
+  "item.drinkbeer.beer_mug_frothy_pink_eggnog": "粉红泡沫蛋酒",
+  "item.drinkbeer.beer_mug_night_howl_kvass": "月夜狼嚎格瓦斯",
   "block.drinkbeer.beer_mug": "矿工麦酒",
   "block.drinkbeer.beer_mug_blaze_stout": "烈焰黑啤",
   "block.drinkbeer.beer_mug_blaze_milk_stout": "烈焰牛奶黑啤",
@@ -32,5 +41,6 @@
   "item.drinkbeer.beer_mug_night_howl_kvass.tooltip": "夜视 2:00-7:00 （与满月程度成正比）",
   "drinkbeer.restores_hunger": "饥饿值回复: ",
   "effect.drinkbeer.drunk": "醉酒",
-  "effect.drinkbeer.drunk_frost_walker": "醉酒的冰霜行者"
+  "effect.drinkbeer.drunk_frost_walker": "醉酒的冰霜行者",
+  "death.attack.drinkbeer.alcohol": "%1$s酗酒而死。"
 }

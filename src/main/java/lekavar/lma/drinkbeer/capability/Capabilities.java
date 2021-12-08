@@ -24,23 +24,24 @@ public class Capabilities {
         CapabilityManager.INSTANCE.register(IBeerInfo.class, new BeerInfoStorage(), BeerInfo::new);
     }
 
-    static class BeerInfoStorage implements Capability.IStorage<IBeerInfo>{
+    // TODO change serialize method to bytearray
+    static class BeerInfoStorage implements Capability.IStorage<IBeerInfo> {
         @Nullable
         @Override
         public INBT writeNBT(Capability<IBeerInfo> capability, IBeerInfo instance, Direction side) {
             CompoundNBT nbt = new CompoundNBT();
             nbt.putBoolean("is_flavored", instance.isFlavoredBeer());
-            if(instance.isFlavoredBeer()){
-                nbt.putInt("base_flavor_total",instance.getBaseFlavor().size());
+            if (instance.isFlavoredBeer()) {
+                nbt.putInt("base_flavor_total", instance.getBaseFlavor().size());
                 int i = 1;
-                for(IFlavor flavor:instance.getBaseFlavor()){
-                    nbt.putByte("base_flavor_"+i, BaseFlavors.toByte(flavor));
+                for (IFlavor flavor : instance.getBaseFlavor()) {
+                    nbt.putByte("base_flavor_" + i, BaseFlavors.toByte(flavor));
                     i++;
                 }
-                nbt.putInt("combo_flavor_total",instance.getComboFlavor().size());
+                nbt.putInt("combo_flavor_total", instance.getComboFlavor().size());
                 i = 1;
-                for(IFlavor flavor:instance.getComboFlavor()){
-                    nbt.putByte("combo_flavor_"+i, ComboFlavors.toByte(flavor));
+                for (IFlavor flavor : instance.getComboFlavor()) {
+                    nbt.putByte("combo_flavor_" + i, ComboFlavors.toByte(flavor));
                     i++;
                 }
             }
@@ -51,19 +52,19 @@ public class Capabilities {
         public void readNBT(Capability<IBeerInfo> capability, IBeerInfo instance, Direction side, INBT nbt) {
             boolean isFlavored = ((CompoundNBT) nbt).getBoolean("is_flavored");
             instance.setFlavoredBeer(isFlavored);
-            if(isFlavored){
+            if (isFlavored) {
                 int i = ((CompoundNBT) nbt).getInt("base_flavor_total");
-                if(i>0){
+                if (i > 0) {
                     List<IFlavor> flavors = new ArrayList<>();
-                    for(int j=1;j<=i;j++){
+                    for (int j = 1; j <= i; j++) {
                         flavors.add(BaseFlavors.fromByte(((CompoundNBT) nbt).getByte("base_flavor_" + j)));
                     }
                     instance.setBaseFlavor(flavors);
                 }
                 i = ((CompoundNBT) nbt).getInt("combo_flavor_total");
-                if(i>0){
+                if (i > 0) {
                     List<IFlavor> flavors = new ArrayList<>();
-                    for(int j=1;j<=i;j++){
+                    for (int j = 1; j <= i; j++) {
                         flavors.add(ComboFlavors.fromByte(((CompoundNBT) nbt).getByte("combo_flavor_" + j)));
                     }
                     instance.setComboFlavor(flavors);

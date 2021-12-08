@@ -30,13 +30,13 @@ public class CallBellBlock extends Block {
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
+    public VoxelShape getShape(BlockState blockState, IBlockReader blockReader, BlockPos blockPos, ISelectionContext selectionContext) {
         return SHAPE;
     }
 
     @Override
-    public BlockState updateShape(BlockState p_196271_1_, Direction p_196271_2_, BlockState p_196271_3_, IWorld p_196271_4_, BlockPos p_196271_5_, BlockPos p_196271_6_) {
-        return p_196271_2_ == Direction.DOWN && !p_196271_1_.canSurvive(p_196271_4_, p_196271_5_) ? Blocks.AIR.defaultBlockState() : super.updateShape(p_196271_1_, p_196271_2_, p_196271_3_, p_196271_4_, p_196271_5_, p_196271_6_);
+    public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState1, IWorld iWorld, BlockPos blockPos, BlockPos blockPos1) {
+        return direction == Direction.DOWN && !blockState.canSurvive(iWorld, blockPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(blockState, direction, blockState1, iWorld, blockPos, blockPos1);
     }
 
     @Override
@@ -46,6 +46,8 @@ public class CallBellBlock extends Block {
                 world.playSound(null, pos, SoundEventRegistry.IRON_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.5f, 1f);
             } else if (state.getBlock() == BlockRegistry.GOLDEN_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.8f, 1f);
+            }  else if (state.getBlock() == BlockRegistry.LEKAS_CALL_BELL.get()) {
+                world.playSound(null, pos, SoundEventRegistry.LEKAS_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 0.9f, 1f);
             }
         }
         return ActionResultType.sidedSuccess(world.isClientSide);

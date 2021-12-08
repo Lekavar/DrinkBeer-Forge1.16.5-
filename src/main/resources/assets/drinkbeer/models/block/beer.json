@@ -1,0 +1,6 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "drinkbeer:block/beer_barrel_top"
+  }
+}

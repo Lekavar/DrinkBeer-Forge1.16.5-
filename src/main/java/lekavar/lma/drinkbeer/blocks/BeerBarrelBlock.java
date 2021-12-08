@@ -1,8 +1,9 @@
 package lekavar.lma.drinkbeer.blocks;
 
-import lekavar.lma.drinkbeer.tileentity.BeerBarrelTileEntity;
+import lekavar.lma.drinkbeer.blocks.tileentity.BeerBarrelTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -23,9 +24,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BeerBarrelBlock extends Block {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-
+public class BeerBarrelBlock extends HorizontalBlock {
     protected static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 15, 15);
 
     public BeerBarrelBlock() {
@@ -34,7 +33,7 @@ public class BeerBarrelBlock extends Block {
     }
 
     @Override
-    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_) {
+    public VoxelShape getShape(BlockState blockState, IBlockReader blockReader, BlockPos blockPos, ISelectionContext selectionContext) {
         return SHAPE;
     }
 
@@ -53,11 +52,8 @@ public class BeerBarrelBlock extends Block {
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         if (!world.isClientSide) {
             world.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundCategory.BLOCKS, 1f, 1f);
-
             BeerBarrelTileEntity beerBarrelTileEntity = (BeerBarrelTileEntity) world.getBlockEntity(pos);
-            NetworkHooks.openGui((ServerPlayerEntity) player, beerBarrelTileEntity, (PacketBuffer packerBuffer) -> {
-                packerBuffer.writeBlockPos(beerBarrelTileEntity.getBlockPos());
-            });
+            NetworkHooks.openGui((ServerPlayerEntity) player, beerBarrelTileEntity, pos);
         }
         return ActionResultType.sidedSuccess(world.isClientSide);
     }
