@@ -4,21 +4,22 @@ import com.google.common.collect.Lists;
 import lekavar.lma.drinkbeer.blocks.legacy.BeerMugBlock;
 import lekavar.lma.drinkbeer.capability.Capabilities;
 import lekavar.lma.drinkbeer.capability.beerinfo.IBeerInfo;
+import lekavar.lma.drinkbeer.essentials.flavor.AbstractBaseFlavor;
+import lekavar.lma.drinkbeer.essentials.flavor.IFlavor;
 import lekavar.lma.drinkbeer.items.BeerItem;
 import lekavar.lma.drinkbeer.registries.BlockRegistry;
-import lekavar.lma.drinkbeer.blocks.tileentity.BeerBlockTileEntity;
+import lekavar.lma.drinkbeer.blocks.tileentity.BeerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -38,6 +39,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 
 public class BeerBlock extends Block {
@@ -55,11 +58,11 @@ public class BeerBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState blockState, IBlockReader blockReader, BlockPos blockPos, ISelectionContext selectionContext) {
-        BeerBlockTileEntity beerBlockTileEntity = ((BeerBlockTileEntity) blockReader.getBlockEntity(blockPos));
-        if (beerBlockTileEntity == null)
+        BeerTileEntity beerTileEntity = ((BeerTileEntity) blockReader.getBlockEntity(blockPos));
+        if (beerTileEntity == null)
             return SHAPE_BY_AMOUNT[0];
         else
-            return SHAPE_BY_AMOUNT[beerBlockTileEntity.getCount()];
+            return SHAPE_BY_AMOUNT[beerTileEntity.getCount()];
     }
 
     @Override
@@ -76,17 +79,18 @@ public class BeerBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new BeerBlockTileEntity();
+        return new BeerTileEntity();
     }
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        BeerBlockTileEntity tileentity = (BeerBlockTileEntity) world.getBlockEntity(pos);
+        BeerTileEntity tileentity = (BeerTileEntity) world.getBlockEntity(pos);
             ItemStack itemStack = tileentity.getBeerType().getItem().get().getDefaultInstance();
             IBeerInfo beerInfo = itemStack.getCapability(Capabilities.BEER_INFO_CAPABILITY, null)
                     .orElseThrow(() -> new RuntimeException("Things goes wrong! Server side cannot get BeerInfo from ItemStack " + itemStack + " when get beer by middle mouse bottom"));
             beerInfo.setFlavoredBeer(tileentity.isFlavored());
             if (tileentity.isFlavored()) {
+                beerInfo.setFlavoredBeer(true);
                 beerInfo.setBaseFlavor(tileentity.getBaseFlavor());
                 beerInfo.setComboFlavor(tileentity.getComboFlavor());
             }
@@ -99,11 +103,10 @@ public class BeerBlock extends Block {
         return BlockRenderType.ENTITYBLOCK_ANIMATED;
     }
 
-    //FIXME
     @Override
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         ItemStack itemStack = player.getItemInHand(hand);
-        BeerBlockTileEntity tileEntity = (BeerBlockTileEntity) world.getBlockEntity(pos);
+        BeerTileEntity tileEntity = (BeerTileEntity) world.getBlockEntity(pos);
         // Stackup Bear
         if (itemStack.getItem() instanceof BeerItem) {
             if (world.isClientSide()) {
@@ -180,24 +183,22 @@ public class BeerBlock extends Block {
         return PushReaction.DESTROY;
     }
 
+    // FIXME: on break do not drop
     @Override
     public List<ItemStack> getDrops(BlockState blockState, LootContext.Builder builder) {
-        Entity entity = builder.getOptionalParameter(LootParameters.THIS_ENTITY);
-        if (entity instanceof PlayerEntity) {
-            TileEntity tileentity = builder.getOptionalParameter(LootParameters.BLOCK_ENTITY);
-            if (tileentity instanceof BeerBlockTileEntity) {
-                BeerBlockTileEntity beerBlockTileEntity = (BeerBlockTileEntity) tileentity;
-                ItemStack itemStack = beerBlockTileEntity.getBeerType().getItem().get().getDefaultInstance();
-                IBeerInfo beerInfo = itemStack.getCapability(Capabilities.BEER_INFO_CAPABILITY, null)
-                        .orElseThrow(() -> new RuntimeException("Things goes wrong! Server side cannot get BeerInfo from ItemStack " + itemStack + " when get drop from placed beer."));
-                beerInfo.setFlavoredBeer(beerBlockTileEntity.isFlavored());
-                if (beerBlockTileEntity.isFlavored()) {
-                    beerInfo.setBaseFlavor(beerBlockTileEntity.getBaseFlavor());
-                    beerInfo.setComboFlavor(beerBlockTileEntity.getComboFlavor());
-                }
-                itemStack.setCount(beerBlockTileEntity.getCount());
-                return Lists.newArrayList(itemStack);
+        TileEntity tileentity = builder.getOptionalParameter(LootParameters.BLOCK_ENTITY);
+        if (tileentity instanceof BeerTileEntity) {
+            BeerTileEntity beerTileEntity = (BeerTileEntity) tileentity;
+            ItemStack itemStack = beerTileEntity.getBeerType().getItem().get().getDefaultInstance();
+            IBeerInfo beerInfo = itemStack.getCapability(Capabilities.BEER_INFO_CAPABILITY, null)
+                    .orElseThrow(() -> new RuntimeException("Things goes wrong! Server side cannot get BeerInfo from ItemStack " + itemStack + " when get drop from placed beer."));
+            beerInfo.setFlavoredBeer(beerTileEntity.isFlavored());
+            if (beerTileEntity.isFlavored()) {
+                beerInfo.setBaseFlavor(beerTileEntity.getBaseFlavor());
+                beerInfo.setComboFlavor(beerTileEntity.getComboFlavor());
             }
+            itemStack.setCount(beerTileEntity.getCount());
+            return Lists.newArrayList(itemStack);
         }
         return new ArrayList<>();
     }
@@ -221,5 +222,23 @@ public class BeerBlock extends Block {
     @Override
     public boolean propagatesSkylightDown(BlockState blockState, IBlockReader blockReader, BlockPos blockPos) {
         return true;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public void animateTick(BlockState blockState, World world, BlockPos pos, Random random) {
+        if (random.nextInt(5) == 0) {
+            BeerTileEntity tileEntity = (BeerTileEntity) world.getBlockEntity(pos);
+            Optional<IFlavor> particleFlavor = tileEntity.getParticleFlavor();
+            particleFlavor.ifPresent( flavor -> {
+                IParticleData particle = ((AbstractBaseFlavor) flavor).getDisplayParticle();
+                if (random.nextInt(5) == 0) {
+                    double x = (double) pos.getX() + 0.5D;
+                    double y = (double) pos.getY() + 0.5D + random.nextDouble() / 4;
+                    double z = (double) pos.getZ() + 0.5D;
+                    world.addParticle(particle, x, y, z, 0.0D, 0.0D, 0.0D);
+                }
+            });
+        }
     }
 }

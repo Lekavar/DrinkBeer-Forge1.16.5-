@@ -49,14 +49,6 @@ public class BeerBarrelContainer extends Container {
         addDataSlots(syncData);
     }
 
-    public BeerBarrelContainer(int id, PlayerInventory playerInventory, PacketBuffer data) {
-        this(id, playerInventory, data.readBlockPos());
-    }
-
-    public BeerBarrelContainer(int id, PlayerInventory playerInventory, BlockPos pos) {
-        this(id, ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)), ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData, playerInventory, ((BeerBarrelTileEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
-    }
-
     private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
         for (int i = 0; i < amount; i++) {
             addSlot(new SlotItemHandler(handler, index, x, y));
@@ -140,8 +132,8 @@ public class BeerBarrelContainer extends Container {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity p_75145_1_) {
-        return this.brewingSpace.stillValid(p_75145_1_);
+    public boolean stillValid(PlayerEntity playerEntity) {
+        return brewingSpace.stillValid(playerEntity);
     }
 
     public boolean getIsBrewing() {

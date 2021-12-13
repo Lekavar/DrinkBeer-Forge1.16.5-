@@ -22,8 +22,9 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class BeerBlockTileEntity extends TileEntity implements IAnimatable {
+public class BeerTileEntity extends TileEntity implements IAnimatable {
     private final AnimationFactory factory = new AnimationFactory(this);
     boolean isFlavored;
     int count;
@@ -32,8 +33,8 @@ public class BeerBlockTileEntity extends TileEntity implements IAnimatable {
     List<IFlavor> comboFlavor;
     IFlavor particleFlavor; //The of base flavor
 
-    public BeerBlockTileEntity() {
-        super(TileEntityRegistry.BEER_BLOCK_TILEENTITY.get());
+    public BeerTileEntity() {
+        super(TileEntityRegistry.BEER_TILEENTITY.get());
         count = 1;
         beerType = Beers.MINER_PALE_ALE;
         isFlavored = false;
@@ -89,6 +90,10 @@ public class BeerBlockTileEntity extends TileEntity implements IAnimatable {
 
     public List<IFlavor> getComboFlavor() {
         return comboFlavor;
+    }
+
+    public Optional<IFlavor> getParticleFlavor() {
+        return Optional.ofNullable(particleFlavor);
     }
 
     /**
@@ -161,7 +166,7 @@ public class BeerBlockTileEntity extends TileEntity implements IAnimatable {
         compoundNBT.putInt("count", count);
         compoundNBT.putBoolean("is_flavored", isFlavored);
         if (isFlavored)
-            compoundNBT.putByte("type", BaseFlavors.toByte(particleFlavor));
+            compoundNBT.putByte("particle_flavor", BaseFlavors.toByte(particleFlavor));
         return compoundNBT;
     }
 

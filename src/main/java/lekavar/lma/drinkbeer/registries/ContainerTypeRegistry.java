@@ -2,11 +2,13 @@ package lekavar.lma.drinkbeer.registries;
 
 import lekavar.lma.drinkbeer.DrinkBeer;
 import lekavar.lma.drinkbeer.blocks.tileentity.BeerBarrelTileEntity;
+import lekavar.lma.drinkbeer.blocks.tileentity.TradeBoxTileEntity;
 import lekavar.lma.drinkbeer.gui.container.BartendingTableContainer;
 import lekavar.lma.drinkbeer.gui.container.BeerBarrelContainer;
+import lekavar.lma.drinkbeer.gui.container.TradeBoxContainer;
 import lekavar.lma.drinkbeer.gui.screen.BartendingTableContainerScreen;
 import lekavar.lma.drinkbeer.gui.screen.BeerBarrelContainerScreen;
-import net.minecraft.client.Minecraft;
+import lekavar.lma.drinkbeer.gui.screen.TradeBoxContainerScreen;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.util.IWorldPosCallable;
@@ -33,6 +35,13 @@ public class ContainerTypeRegistry {
         BlockPos pos = data.readBlockPos();
         return new BartendingTableContainer(id,inv, IWorldPosCallable.create(inv.player.level,pos));
     }));
+    public static final RegistryObject<ContainerType<TradeBoxContainer>> TRADE_BOX_CONTAINER = CONTAINERS.register("trade_box_container", () -> IForgeContainerType.create((id, inv, data)->{
+        BlockPos pos = data.readBlockPos();
+        TradeBoxTileEntity tileEntity = ((TradeBoxTileEntity) inv.player.level.getBlockEntity(pos));
+        String residentNameKey = data.readUtf();
+        String locationNameKey = data.readUtf();
+        return new TradeBoxContainer(id,inv,tileEntity, tileEntity.syncData,residentNameKey,locationNameKey);
+    }));
 
 
     @SubscribeEvent
@@ -40,6 +49,7 @@ public class ContainerTypeRegistry {
         event.enqueueWork(() -> {
             ScreenManager.register(ContainerTypeRegistry.BEER_BARREL_CONTAINER.get(), BeerBarrelContainerScreen::new);
             ScreenManager.register(ContainerTypeRegistry.BARTENDING_TABLE_CONTAINER.get(), BartendingTableContainerScreen::new);
+            ScreenManager.register(ContainerTypeRegistry.TRADE_BOX_CONTAINER.get(), TradeBoxContainerScreen::new);
         });
     }
 }

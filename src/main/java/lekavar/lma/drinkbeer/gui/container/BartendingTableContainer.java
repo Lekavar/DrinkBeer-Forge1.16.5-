@@ -36,20 +36,22 @@ import java.util.stream.Collectors;
 
 public class BartendingTableContainer extends Container {
     private final static int BASE_FLAVOR_LIMIT = 3;
-    private final IInventory tablespace = new Inventory(4){
-        @Override
-        public void setChanged() {
-            super.setChanged();
-            BartendingTableContainer.this.slotsChanged(this);
-        }
-    };
-    private final IInventory resultSpace = new Inventory(1);
+    private final IInventory tablespace;
+    private final IInventory resultSpace;
     private final IWorldPosCallable access;
 
 
     public BartendingTableContainer(int id, PlayerInventory playerInventory, IWorldPosCallable worldPosCallable) {
         super(ContainerTypeRegistry.BARTENDING_TABLE_CONTAINER.get(), id);
         access = worldPosCallable;
+        tablespace = new Inventory(4){
+            @Override
+            public void setChanged() {
+                super.setChanged();
+                BartendingTableContainer.this.slotsChanged(this);
+            }
+        };
+        resultSpace = new Inventory(1);
 
         // Layout Slot
         // Player Inventory
@@ -233,7 +235,6 @@ public class BartendingTableContainer extends Container {
     public void removed(PlayerEntity player) {
         if (!player.level.isClientSide()) {
             // Return Item to Player;
-            //FIXME return things back did not work normally
             for (int i = 0; i < 4; i++) {
                 if (!tablespace.getItem(i).isEmpty()) {
                     ItemHandlerHelper.giveItemToPlayer(player, tablespace.removeItem(i, tablespace.getItem(i).getCount()));

@@ -63,5 +63,15 @@
     "sounds": [
       "drinkbeer:bartending_table_open"
     ]
+  },
+  "trade_box_close":{
+    "sounds": [
+      "drinkbeer:trade_box_close"
+    ]
+  },
+  "trade_box_open":{
+    "sounds": [
+      "drinkbeer:trade_box_open"
+    ]
   }
 }

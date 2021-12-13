@@ -5,6 +5,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.world.World;
 
@@ -77,6 +79,8 @@ public class BaseFlavors {
         return flavors;
     }
 
+    //TODO 需要给加一个用来给ComboFlavor判断是否能同等视为某风味的方法
+
     static class Spicy extends AbstractBaseFlavor {
 
         @Override
@@ -99,6 +103,11 @@ public class BaseFlavors {
         public List<IFlavor> getOverridableFlavor() {
             return Lists.newArrayList(FIERY);
         }
+
+        @Override
+        public IParticleData getDisplayParticle() {
+            return ParticleTypes.LAVA;
+        }
     }
 
     static class Fiery extends AbstractBaseFlavor {
@@ -116,6 +125,11 @@ public class BaseFlavors {
         @Override
         public float modifyHealthModifier(World world, ItemStack stack, LivingEntity livingEntity, float healthModifier) {
             return healthModifier - 4;
+        }
+
+        @Override
+        public IParticleData getDisplayParticle() {
+            return ParticleTypes.LAVA;
         }
     }
 

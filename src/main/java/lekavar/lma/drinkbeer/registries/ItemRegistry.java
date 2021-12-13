@@ -18,6 +18,7 @@ public class ItemRegistry {
     //general
     public static final RegistryObject<Item> BEER_BARREL = ITEMS.register("beer_barrel", () -> new BlockItem(BlockRegistry.BEER_BARREL.get(), new Item.Properties().tab(ModGroup.GENERAL)));
     public static final RegistryObject<Item> BARTENDING_TABLE = ITEMS.register("bartending_table", () -> new BlockItem(BlockRegistry.BARTENDING_TABLE.get(), new Item.Properties().tab(ModGroup.GENERAL)));
+    public static final RegistryObject<Item> TRADE_BOX = ITEMS.register("trade_box", () -> new BlockItem(BlockRegistry.TRADE_BOX.get(), new Item.Properties().tab(ModGroup.GENERAL)));
     public static final RegistryObject<Item> EMPTY_BEER_MUG = ITEMS.register("empty_beer_mug", () -> new BlockItem(BlockRegistry.EMPTY_BEER_MUG.get(), new Item.Properties().tab(ModGroup.GENERAL)));
 
     public static final RegistryObject<Item> IRON_CALL_BELL = ITEMS.register("iron_call_bell", () -> new BlockItem(BlockRegistry.IRON_CALL_BELL.get(), new Item.Properties().tab(ModGroup.GENERAL)));

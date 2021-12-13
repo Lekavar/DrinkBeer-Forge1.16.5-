@@ -1,6 +1,8 @@
 package lekavar.lma.drinkbeer.blocks;
 
+import lekavar.lma.drinkbeer.misc.MiscUtils;
 import lekavar.lma.drinkbeer.registries.BlockRegistry;
+import lekavar.lma.drinkbeer.registries.ParticleTypeRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -8,6 +10,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -20,6 +23,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class CallBellBlock extends Block {
 
@@ -42,12 +46,18 @@ public class CallBellBlock extends Block {
     @Override
     public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
         if (!world.isClientSide()) {
+            double x = pos.getX() + 0.5D;
+            double y = pos.getY() + 0.2D + player.getRandom().nextDouble() / 4;
+            double z = pos.getZ() + 0.5D;
             if (state.getBlock() == BlockRegistry.IRON_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.IRON_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.5f, 1f);
+                MiscUtils.addParticle((ServerWorld) world,ParticleTypes.NOTE,x,y,z,0,0,0,0,1);
             } else if (state.getBlock() == BlockRegistry.GOLDEN_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.GOLDEN_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 1.8f, 1f);
+                MiscUtils.addParticle((ServerWorld) world,ParticleTypes.NOTE,x,y,z,0,0,0,0,1);
             }  else if (state.getBlock() == BlockRegistry.LEKAS_CALL_BELL.get()) {
                 world.playSound(null, pos, SoundEventRegistry.LEKAS_CALL_BELL_TINKLING.get(), SoundCategory.BLOCKS, 0.9f, 1f);
+                MiscUtils.addParticle((ServerWorld) world, ParticleTypeRegistry.CALL_BELL_TINKLE_PAW.get(),x,y,z,0,0,0,0,1);
             }
         }
         return ActionResultType.sidedSuccess(world.isClientSide);

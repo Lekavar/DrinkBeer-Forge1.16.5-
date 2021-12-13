@@ -33,10 +33,4 @@ public class BartendingTableContainerScreen extends ContainerScreen<BartendingTa
         int j = (this.height - this.getYSize()) / 2;
         blit(stack, i, j, 0, 0, imageWidth, imageHeight);
     }
-
-    @Override
-    protected void renderLabels(MatrixStack stack, int x, int y) {
-        drawCenteredString(stack, this.font, this.title, this.imageWidth / 2, (int) this.titleLabelY, 4210752);
-        this.font.draw(stack, this.inventory.getDisplayName(), (float) this.inventoryLabelX, (float) this.inventoryLabelY, 4210752);
-    }
 }

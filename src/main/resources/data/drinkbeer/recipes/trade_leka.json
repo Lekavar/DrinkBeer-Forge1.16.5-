@@ -1,0 +1,105 @@
+{
+  "type": "drinkbeer:trading",
+  "residentNameKey": "leka",
+  "locationNameKey": "northon",
+  "need": {
+    "normal": [
+      {
+        "good": {
+          "item": "minecraft:coal"
+        },
+        "min": 2,
+        "max": 5
+      },
+      {
+        "good": {
+          "item": "minecraft:charcoal"
+        },
+        "min": 1,
+        "max": 4
+      },
+      {
+        "good": {
+          "item": "minecraft:white_wool"
+        },
+        "min": 1,
+        "max": 2
+      },
+      {
+        "good": {
+          "item": "minecraft:bone"
+        },
+        "min": 2,
+        "max": 4
+      }
+    ],
+    "rare": [
+      {
+        "good": {
+          "item": "drinkbeer:beer_mug_night_howl_kvass"
+        },
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  "offer": {
+    "normal": [
+      {
+        "good": {
+          "item": "drinkbeer:spice_ice_patchouli"
+        },
+        "min": 1,
+        "max": 3
+      },
+      {
+        "good": {
+          "item": "drinkbeer:spice_amethyst_nigella_seeds"
+        },
+        "min": 1,
+        "max": 3
+      }
+    ],
+    "rare": [
+      {
+        "good": {
+          "item": "drinkbeer:spice_citrine_nigella_seeds"
+        },
+        "min": 1,
+        "max": 2
+      },
+      {
+        "good": {
+          "item": "drinkbeer:spice_ice_patchouli"
+        },
+        "min": 1,
+        "max": 2
+      }
+    ],
+    "super_rare": [
+      {
+        "good": {
+          "item": "minecraft:blue_ice"
+        },
+        "min": 1,
+        "max": 2
+      },
+      {
+        "good": {
+          "item": "drinkbeer:spice_storm_shards"
+        },
+        "min": 1,
+        "max": 2
+      }
+    ],
+    "unique": [
+      {
+        "good": {
+          "item": "drinkbeer:lekas_call_bell"
+        },
+        "min": 1,
+        "max": 1
+      }
+    ]
+  }
+}

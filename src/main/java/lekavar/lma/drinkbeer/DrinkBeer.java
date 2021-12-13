@@ -27,6 +27,7 @@ public class DrinkBeer {
         EffectRegistry.STATUS_EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ContainerTypeRegistry.CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
         RecipeRegistry.RECIPE_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        ParticleTypeRegistry.PARTICLE_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         Beers.registryAll();
         BaseFlavors.registerAll();

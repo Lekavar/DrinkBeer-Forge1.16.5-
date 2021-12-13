@@ -13,6 +13,6 @@ public class RendererRegistry {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientSetUpEvent(FMLClientSetupEvent event) {
-        ClientRegistry.bindTileEntityRenderer(TileEntityRegistry.BEER_BLOCK_TILEENTITY.get(), BeerBlockRenderer::new);
+        ClientRegistry.bindTileEntityRenderer(TileEntityRegistry.BEER_TILEENTITY.get(), BeerBlockRenderer::new);
     }
 }

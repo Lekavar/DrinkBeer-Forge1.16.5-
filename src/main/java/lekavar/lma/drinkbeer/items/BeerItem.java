@@ -11,7 +11,7 @@ import lekavar.lma.drinkbeer.misc.ModGroup;
 import lekavar.lma.drinkbeer.registries.BlockRegistry;
 import lekavar.lma.drinkbeer.registries.ItemRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
-import lekavar.lma.drinkbeer.blocks.tileentity.BeerBlockTileEntity;
+import lekavar.lma.drinkbeer.blocks.tileentity.BeerTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -113,13 +113,12 @@ public class BeerItem extends Item implements IAnimatable {
         return beer;
     }
 
-    //FIXME
     protected boolean updateCustomBlockEntityTag(World level, @Nullable PlayerEntity player, BlockPos blockPos, ItemStack itemStack) {
         MinecraftServer minecraftserver = level.getServer();
         if (minecraftserver == null) {
             return false;
         }
-        BeerBlockTileEntity tileentity = (BeerBlockTileEntity) level.getBlockEntity(blockPos);
+        BeerTileEntity tileentity = (BeerTileEntity) level.getBlockEntity(blockPos);
         if (tileentity != null) {
             if (!level.isClientSide && tileentity.onlyOpCanSetNbt() && (player == null || !player.canUseGameMasterBlocks())) {
                 return false;

@@ -3,12 +3,10 @@ package lekavar.lma.drinkbeer.recipes;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import lekavar.lma.drinkbeer.registries.RecipeRegistry;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
@@ -20,8 +18,6 @@ import net.minecraftforge.registries.ForgeRegistryEntry;
 import javax.annotation.Nullable;
 import java.util.List;
 
-
-//TODO 先重写完酒桶
 public class BrewingRecipe implements IRecipe<IBrewingInventory> {
     private final ResourceLocation id;
     private final NonNullList<Ingredient> input;
@@ -130,8 +126,16 @@ public class BrewingRecipe implements IRecipe<IBrewingInventory> {
         @Override
         public BrewingRecipe fromJson(ResourceLocation resourceLocation, JsonObject jsonObject) {
             NonNullList<Ingredient> ingredients = itemsFromJson(JSONUtils.getAsJsonArray(jsonObject, "ingredients"));
+            if (ingredients.isEmpty()) {
+                throw new JsonParseException("No ingredients for brewing recipe");
+            } else if (ingredients.size() > 4) {
+                throw new JsonParseException("Too many ingredients for brewing recipe the max is " + 4);
+            }
             ItemStack cup = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(jsonObject, "cup"), true);
             int brewing_time = JSONUtils.getAsInt(jsonObject, "brewing_time");
+            if(brewing_time<=0){
+                throw new JsonParseException("Brewing Recipe brewing_time is not valid");
+            }
             ItemStack result = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(jsonObject, "result"), true);
             return new BrewingRecipe(resourceLocation, ingredients, cup, brewing_time, result);
         }

@@ -22,6 +22,8 @@ public class SoundEventRegistry {
     public static final RegistryObject<SoundEvent> UNPACKING_PACKAGE = register("unpacking_package");
     public static final RegistryObject<SoundEvent> CLOSING_BARTENDING_TABLE = register("bartending_table_close");
     public static final RegistryObject<SoundEvent> OPENING_BARTENDING_TABLE = register("bartending_table_open");
+    public static final RegistryObject<SoundEvent> CLOSING_TRADE_BOX = register("trade_box_close");
+    public static final RegistryObject<SoundEvent> OPENING_TRADE_BOX = register("trade_box_open");
 
 
     private static RegistryObject<SoundEvent> register(String name) {

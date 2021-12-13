@@ -37,8 +37,8 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     private int statusCode;
     public final IIntArray syncData = new IIntArray() {
         @Override
-        public int get(int p_221476_1_) {
-            switch (p_221476_1_) {
+        public int get(int i) {
+            switch (i) {
                 case 0:
                     return remainingBrewTime;
                 case 1:
@@ -49,13 +49,13 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
         }
 
         @Override
-        public void set(int p_221477_1_, int p_221477_2_) {
-            switch (p_221477_1_) {
+        public void set(int i, int v) {
+            switch (i) {
                 case 0:
-                    remainingBrewTime = p_221477_2_;
+                    remainingBrewTime = v;
                     break;
                 case 1:
-                    statusCode = p_221477_2_;
+                    statusCode = v;
                     break;
             }
         }
@@ -237,15 +237,15 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT tag = super.getUpdateTag();
-        ItemStackHelper.saveAllItems(tag, this.items);
-        tag.putShort("RemainingBrewTime", (short) this.remainingBrewTime);
+        ItemStackHelper.saveAllItems(tag, items);
+        tag.putShort("RemainingBrewTime", (short) remainingBrewTime);
         return tag;
     }
 
     @Override
     public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        ItemStackHelper.loadAllItems(tag, this.items);
-        this.remainingBrewTime = tag.getShort("RemainingBrewTime");
+        ItemStackHelper.loadAllItems(tag, items);
+        remainingBrewTime = tag.getShort("RemainingBrewTime");
     }
 
     @Override
@@ -255,7 +255,7 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack itemstack : this.items) {
+        for (ItemStack itemstack : items) {
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -265,42 +265,39 @@ public class BeerBarrelTileEntity extends TileEntity implements ITickableTileEnt
 
     @Override
     public ItemStack getItem(int p_70301_1_) {
-        return p_70301_1_ >= 0 && p_70301_1_ < this.items.size() ? this.items.get(p_70301_1_) : ItemStack.EMPTY;
+        return p_70301_1_ >= 0 && p_70301_1_ < items.size() ? items.get(p_70301_1_) : ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItem(int p_70298_1_, int p_70298_2_) {
-        return ItemStackHelper.removeItem(this.items, p_70298_1_, p_70298_2_);
+        return ItemStackHelper.removeItem(items, p_70298_1_, p_70298_2_);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int p_70304_1_) {
-        return ItemStackHelper.takeItem(this.items, p_70304_1_);
+        return ItemStackHelper.takeItem(items, p_70304_1_);
     }
 
     @Override
     public void setItem(int p_70299_1_, ItemStack p_70299_2_) {
-        if (p_70299_1_ >= 0 && p_70299_1_ < this.items.size()) {
-            this.items.set(p_70299_1_, p_70299_2_);
+        if (p_70299_1_ >= 0 && p_70299_1_ < items.size()) {
+            items.set(p_70299_1_, p_70299_2_);
         }
     }
 
     @Override
-    public int getMaxStackSize() {
-        return IBrewingInventory.super.getMaxStackSize();
-    }
-
-    @Override
     public boolean stillValid(PlayerEntity p_70300_1_) {
-        if (this.level.getBlockEntity(this.worldPosition) != this) {
+        if (level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
-            return !(p_70300_1_.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) > 64.0D);
+            return !(p_70300_1_.distanceToSqr((double) worldPosition.getX() + 0.5D, (double) worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) > 64.0D);
         }
     }
 
     @Override
     public void clearContent() {
-        this.items.clear();
+        for(int i=0;i<items.size();i++){
+            items.set(8,ItemStack.EMPTY);
+        }
     }
 }
